@@ -118,8 +118,9 @@ Source de vérité pour :
 - l'outbox ;
 - les webhooks reçus.
 
-Le contenu des actes n'est pas stocké en base, sauf un index de recherche et
-les données du formulaire nécessaires à l'affichage.
+La base conserve une **copie de travail** (`donnees` du formulaire et
+`acte_md` en cours de rédaction) pour l'édition, la recherche et l'affichage.
+GitHub reste la source de vérité du contenu validé, signé et archivé.
 
 ### 3.5 GitHub
 

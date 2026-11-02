@@ -451,7 +451,7 @@ et signer.
 1. `feat/front-validator-queue`
    - [ ] File de validation, onglets par statut, recherche, pagination.
 2. `feat/front-validator-review`
-   - [ ] Contenu de l'acte, `DiffViewer`.
+   - [ ] Contenu de l'acte, `DiffViewer` branché sur `GET /demandes/{id}/diff`.
    - [ ] `DecisionPanel` : approuver, corrections, rejet.
    - [ ] Commentaire obligatoire pour corrections/rejet.
    - [ ] Signature avec confirmation, affichage du hash et du merge.
@@ -511,7 +511,7 @@ npm run build
    - [ ] Verrouillage de la demande contre les doubles actions.
 4. `feat/back-workflow-submit`
    - [ ] Soumission, ouverture de PR, label, reviewers.
-   - [ ] Décisions, historique, export CSV.
+   - [ ] Décisions, historique, diff données/contenu, export CSV.
    - [ ] Tests de chaque transition et des rôles.
 5. `feat/back-signature`
    - [ ] Manifeste de signature, hash, merge, champs de signature.

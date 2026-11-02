@@ -9,6 +9,7 @@ TODO :
   [ ] Tester les cas 401/403/404/409/422.
 """
 
+import json
 from typing import Any
 
 from sqlmodel import Session, select
@@ -19,6 +20,7 @@ from app.schemas.acte import SignatureManifest
 from app.schemas.demande import (
     DecisionRequest,
     DemandeContentUpdate,
+    DemandeDiff,
     DemandeListItem,
     DemandeRead,
     HistoriqueItem,
@@ -300,6 +302,20 @@ def get_history(session: Session, demande_id: int, user: User) -> list[Historiqu
         "L'historique n'est pas encore implémenté.",
         status_code=501,
         code="NOT_IMPLEMENTED",
+    )
+
+
+def get_diff(session: Session, demande_id: int, user: User) -> DemandeDiff:
+    """Compare les données sources au contenu rédigé.
+
+    TODO NDOUNGUE/NOLACK : remplacer `before` par la version précédente de
+    `acte.md` récupérée depuis GitHub (commits du fichier).
+    """
+
+    demande = get_demande(session, demande_id, user)
+    return DemandeDiff(
+        before=json.dumps(demande.donnees, indent=2, ensure_ascii=False),
+        after=demande.acte_md or "",
     )
 
 

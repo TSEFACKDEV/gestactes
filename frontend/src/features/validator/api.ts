@@ -9,6 +9,7 @@
 import { api } from "@/lib/api";
 import type {
   Demande,
+  DemandeDiff,
   DemandeListItem,
   DecisionType,
   HistoriqueItem,
@@ -34,6 +35,11 @@ export async function fetchDemande(id: number): Promise<Demande> {
 
 export async function fetchHistorique(id: number): Promise<HistoriqueItem[]> {
   const { data } = await api.get<HistoriqueItem[]>(`/demandes/${id}/historique`);
+  return data;
+}
+
+export async function fetchDiff(id: number): Promise<DemandeDiff> {
+  const { data } = await api.get<DemandeDiff>(`/demandes/${id}/diff`);
   return data;
 }
 

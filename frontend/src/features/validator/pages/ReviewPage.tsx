@@ -29,6 +29,7 @@ import { useToast } from "@/context/ToastContext";
 import {
   decide,
   fetchDemande,
+  fetchDiff,
   fetchHistorique,
   sign,
 } from "@/features/validator/api";
@@ -56,6 +57,12 @@ export function ValidatorReviewPage() {
   const history = useQuery({
     queryKey: ["validator", "historique", id],
     queryFn: () => fetchHistorique(id),
+    enabled: Number.isFinite(id),
+  });
+
+  const diffQuery = useQuery({
+    queryKey: ["validator", "diff", id],
+    queryFn: () => fetchDiff(id),
     enabled: Number.isFinite(id),
   });
 
@@ -180,8 +187,11 @@ export function ValidatorReviewPage() {
             />
             <CardBody>
               <DiffViewer
-                before={JSON.stringify(demande.donnees, null, 2)}
-                after={demande.acte_md ?? ""}
+                before={
+                  diffQuery.data?.before ??
+                  JSON.stringify(demande.donnees, null, 2)
+                }
+                after={diffQuery.data?.after ?? demande.acte_md ?? ""}
                 emptyLabel="Aucune différence entre les données et le contenu rédigé."
               />
             </CardBody>

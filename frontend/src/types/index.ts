@@ -165,6 +165,11 @@ export interface HistoriqueItem {
   created_at: string;
 }
 
+export interface DemandeDiff {
+  before: string;
+  after: string;
+}
+
 export interface AuditEvent {
   id: number;
   demande_id: number | null;

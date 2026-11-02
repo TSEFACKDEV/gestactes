@@ -105,8 +105,9 @@ flowchart LR
   de domaines nettes.
 - **Worker séparé** pour les jobs GitHub, e-mail et PDF.
 - **Outbox PostgreSQL** plutôt que RabbitMQ : fiable, transactionnel, suffisant.
-- **GitHub** comme source de vérité du contenu ; **PostgreSQL** pour l'état du
-  workflow, l'audit et l'index.
+- **GitHub** comme source de vérité du contenu validé, signé et archivé ;
+  **PostgreSQL** pour l'état du workflow, une copie de travail, l'audit et
+  l'index.
 - **Nginx** pour servir le front et proxifier l'API.
 
 Détails : `docs/architecture.md` et `docs/workflow.md`.

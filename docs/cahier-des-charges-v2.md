@@ -337,8 +337,9 @@ flowchart LR
 - **Simplicité d'abord** : un seul déploiement API, un worker, une base, un front.
 - **Frontières logiques claires** : chaque domaine a ses modèles, schémas,
   routes et services.
-- **GitHub comme source de vérité du contenu** ; PostgreSQL conserve les
-  comptes, l'état du workflow, l'index de recherche, l'audit et l'outbox.
+- **GitHub comme source de vérité du contenu validé, signé et archivé** ;
+  PostgreSQL conserve les comptes, l'état du workflow, une copie de travail du
+  contenu en cours de rédaction, l'index de recherche, l'audit et l'outbox.
 - **Communication hybride** : REST synchrone pour l'utilisateur, jobs
   asynchrones persistants pour GitHub, e-mail et PDF.
 - **Sécurité en profondeur** : validation, RBAC, autorisation objet, secrets
@@ -587,6 +588,7 @@ Le contrat détaillé est dans `docs/api-contract.md`. Base : `/api/v1`.
 | GET | `/demandes/{id}` | Détail. | Selon rôle |
 | POST | `/demandes/{id}/annulation` | Annuler. | Citoyen propriétaire |
 | GET | `/demandes/{id}/historique` | Timeline commits + audit. | Selon rôle |
+| GET | `/demandes/{id}/diff` | Comparaison données sources / contenu rédigé. | Validateur, admin |
 | GET | `/demandes/{id}/pieces/{piece_id}` | Télécharger une pièce. | Selon rôle |
 | POST | `/demandes/{id}/prise-en-charge` | Prendre en charge. | Agent |
 | PUT | `/demandes/{id}/contenu` | Enregistrer le brouillon. | Agent assigné |
@@ -646,7 +648,7 @@ Le contrat détaillé est dans `docs/api-contract.md`. Base : `/api/v1`.
 | `RefreshToken` | id, user_id, token_hash, expires_at, revoked_at, created_at |
 | `PasswordResetToken` | id, user_id, token_hash, expires_at, used_at, created_at |
 | `TypeActe` | id, code unique, label, description, form_schema JSON, template_md, is_active |
-| `Demande` | id, numero unique, type_acte_id, demandeur_id, statut, donnees JSON, issue_number, issue_url, branch_name, pr_number, pr_url, assigned_agent_id, assigned_validator_id, complement_attendu, complement_message, rejection_reason, signature_sha256, signature_manifest JSON, signed_by_id, signed_at, merge_commit_sha, tag_name, created_at, updated_at |
+| `Demande` | id, numero unique, type_acte_id, demandeur_id, statut, donnees JSON (copie de travail), acte_md (copie de travail), issue_number, issue_url, branch_name, pr_number, pr_url, assigned_agent_id, assigned_validator_id, complement_attendu, complement_message, rejection_reason, signature_sha256, signature_manifest JSON, signed_by_id, signed_at, merge_commit_sha, tag_name, created_at, updated_at |
 | `PieceJointe` | id, demande_id, filename, github_path, sha256, size_bytes, content_type, created_at |
 | `AuditEvent` | id, demande_id, actor_id, action, details JSON, commit_sha, created_at |
 | `Notification` | id, user_id, demande_id, title, message, is_read, created_at |

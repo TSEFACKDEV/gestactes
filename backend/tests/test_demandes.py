@@ -10,7 +10,7 @@ TODO :
 
 import pytest
 
-from app.models import Role
+from app.models import Demande, Role, StatutDemande
 
 
 def test_demandes_require_authentication(client):
@@ -29,6 +29,29 @@ def test_citizen_can_list_types(client, auth_headers, type_acte):
     assert response.status_code == 200
     assert len(response.json()) == 1
     assert response.json()[0]["code"] == "attestation-residence"
+
+
+def test_validator_can_get_diff(client, auth_headers, type_acte, users, session):
+    demande = Demande(
+        numero="2026-00001",
+        type_acte_id=type_acte.id or 0,
+        demandeur_id=users[Role.CITOYEN].id or 0,
+        statut=StatutDemande.EN_VALIDATION,
+        donnees={"adresse": "12 rue des Lilas"},
+        acte_md="# Attestation de résidence",
+    )
+    session.add(demande)
+    session.commit()
+    session.refresh(demande)
+
+    response = client.get(
+        f"/api/v1/demandes/{demande.id}/diff",
+        headers=auth_headers(Role.VALIDATEUR),
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert "adresse" in payload["before"]
+    assert payload["after"] == "# Attestation de résidence"
 
 
 @pytest.mark.skip(reason="À implémenter par NDOUNGUE")
