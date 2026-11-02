@@ -63,6 +63,42 @@ Configurer les protections de branches **après** ce premier push.
 
 ---
 
+## 2 bis. Inviter les collaborateurs
+
+1. Ouvrir le dépôt `gestactes` sur GitHub.
+2. **Settings → Collaborators → Add people**.
+3. Ajouter chaque membre avec le rôle **Write**.
+4. Ne pas donner **Admin** : seul TSEFACK administre les branches et les secrets.
+5. Chaque membre reçoit une invitation par e-mail ou notification GitHub.
+6. Après acceptation, il clone le dépôt et suit `docs/onboarding.md`.
+
+Pendant le projet, mettre `develop` comme branche par défaut :
+
+**Settings → General → Default branch → `develop`**.
+
+Ainsi, un nouveau clone démarre directement sur la branche de travail. À la
+release finale, repasser la branche par défaut sur `main`.
+
+### Créer les issues initiales
+
+Après avoir créé les labels :
+
+```bash
+./scripts/setup-github.sh <owner>/gestactes
+./scripts/create-issues.sh <owner>/gestactes
+```
+
+Les issues sont créées sans assignation. Les assigner dans GitHub Projects,
+puis vérifier que chaque issue a :
+
+- un propriétaire ;
+- une branche ;
+- des fichiers ;
+- des tests ;
+- une Definition of Done.
+
+---
+
 ## 3. Labels
 
 Créer les labels avec `gh` (adapter `owner/repo`) :

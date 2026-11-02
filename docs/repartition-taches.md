@@ -4,6 +4,9 @@
 **Version :** 1.0
 **Principe :** un fichier = un propriétaire. Les fichiers partagés sont gelés.
 
+> **Nouveau membre :** lire `docs/onboarding.md` avant ce document. Il contient
+> le parcours du premier jour, les commandes et la FAQ.
+
 ---
 
 ## 1. Règles de fonctionnement
@@ -52,7 +55,7 @@
 | `.env.example`, `.gitignore`, `.editorconfig` | TSEFACK |
 | `docker-compose.yml`, `Makefile` | TSEFACK |
 | `README.md`, `CONTRIBUTING.md` | TSEFACK |
-| `scripts/setup-github.sh`, `backend/scripts/export_openapi.py` | TSEFACK |
+| `scripts/setup-github.sh`, `scripts/create-issues.sh`, `scripts/verify-setup.sh`, `backend/scripts/export_openapi.py` | TSEFACK |
 | `scripts/simulate_webhook.py`, `scripts/data-repo/**` | NOLACK |
 | `data/demo/**` | VOUMIA |
 
@@ -130,7 +133,7 @@
 | Document | Propriétaire |
 |---|---|
 | `docs/revue-cdc.md`, `docs/cahier-des-charges-v2.md` | TSEFACK |
-| `docs/repartition-taches.md`, `docs/guide-contribution.md` | TSEFACK |
+| `docs/repartition-taches.md`, `docs/guide-contribution.md`, `docs/onboarding.md` | TSEFACK |
 | `docs/github-setup.md`, `docs/api-contract.md`, `docs/openapi.json` | TSEFACK |
 | `CHANGELOG.md` | TSEFACK |
 | `docs/architecture.md`, `docs/workflow.md` | NDOUNGUE |

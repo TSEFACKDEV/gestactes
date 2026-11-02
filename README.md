@@ -17,6 +17,54 @@ Projet académique — module **Architecture logicielle et objets répartis**,
 
 ---
 
+## Nouveau membre : commence ici
+
+Si tu viens d'être invité sur le dépôt, ne commence pas par coder au hasard.
+
+1. Lis `docs/onboarding.md` en entier (30 à 45 minutes).
+2. Trouve ton nom dans `docs/repartition-taches.md`.
+3. Travaille sur la branche **`develop`**, jamais sur `main`.
+4. Crée une branche `feat/...` ou `fix/...`.
+5. Ouvre une PR vers `develop`.
+6. TSEFACK relit et fusionne. Tu ne cliques pas sur Merge.
+
+| Membre | Première branche |
+|---|---|
+| TSEFACK CALVIN KLEIN | `chore/github-setup` |
+| GUEMOGNE GERALDINE ESTHER | `feat/front-design-system` |
+| JEUDIEU TSAGUE AUDREY DANIELLE | `feat/front-citizen-dashboard` |
+| KOUODZO ZANGUE REGINA | `feat/back-auth-core` |
+| LEUKAM TCHEUMALEU MAXIME | `feat/front-agent-queue` |
+| METAMMO TEUMA DANIELA CLEDYA | `feat/front-validator-queue` |
+| NDOUNGUE ESSOH ABEL THOMAS | `feat/back-domain-models` |
+| NOLACK KAWUNJIBI FRANGE PARKER | `feat/back-github-client` |
+| NZEUTEM DOMOE EUNICE FELIXTINE | `feat/front-admin-users` |
+| VOUMIA OUALA DILANE | `chore/test-fixtures` |
+
+### Ce qui est déjà fonctionnel
+
+- Authentification : inscription, connexion, refresh, logout, profil, reset.
+- Catalogue des trois types d'actes et données de démonstration.
+- Administration de base : utilisateurs, audit, statistiques.
+- Notifications internes, webhook GitHub signé et idempotent.
+- Endpoint de comparaison pour la revue du validateur.
+- Design system, toutes les routes par rôle, pages et composants.
+- Docker Compose, CI, tests de base, seed.
+
+### Ce qui reste à implémenter
+
+- Création, liste, détail et annulation des demandes.
+- Machine à états complète : prise en charge, instruction, soumission.
+- Provisioning GitHub : Issue, branche, commits, PR.
+- Signature, merge, PDF, QR code, archive, tag.
+- Traitement complet des webhooks et réconciliation.
+- Tests de fonctionnalités et recette finale.
+
+Les détails, les branches et les critères de conformité sont dans
+`docs/repartition-taches.md`.
+
+---
+
 ## 1. Pourquoi GestActes
 
 Un acte administratif partage plusieurs contraintes avec un code source :
@@ -209,6 +257,14 @@ docker compose up --build
 docker compose exec api python -m app.seed
 ```
 
+### Vérifier l'installation
+
+```bash
+./scripts/verify-setup.sh
+# ou
+make doctor
+```
+
 ### Comptes
 
 | Rôle | E-mail | Mot de passe |
@@ -299,6 +355,7 @@ python scripts/simulate_webhook.py \
 | `docs/workflow.md` | États, transitions, rôles, effets. |
 | `docs/api-contract.md` | Contrat REST gelé. |
 | `docs/design-system.md` | Direction artistique et composants. |
+| `docs/onboarding.md` | Parcours du premier jour et FAQ. |
 | `docs/repartition-taches.md` | Propriétaires, branches, tâches. |
 | `docs/guide-contribution.md` | Commandes Git et processus de PR. |
 | `docs/github-setup.md` | Labels, protections, token, webhook. |
@@ -325,6 +382,34 @@ python scripts/simulate_webhook.py \
 | VOUMIA OUALA DILANE | Qualité, tests, seed, recette, démo |
 
 Encadrant : **M. TCHUIGOUA CHARLU**.
+
+---
+
+## Inviter l'équipe sur GitHub
+
+1. Ouvrir le dépôt GitHub.
+2. **Settings → Collaborators → Add people**.
+3. Ajouter chaque membre avec le rôle **Write**.
+4. Ne pas donner **Admin** : seul TSEFACK administre les branches et les secrets.
+5. Chaque membre accepte l'invitation, clone le dépôt et suit
+   `docs/onboarding.md`.
+
+Pendant la période de développement, il est recommandé de mettre `develop`
+comme branche par défaut sur GitHub :
+
+**Settings → General → Default branch → `develop`**.
+
+Cela évite qu'un nouveau clone démarre sur `main`. À la release finale,
+repasser la branche par défaut sur `main`.
+
+TSEFACK doit ensuite :
+
+- [ ] Remplacer `@TSEFACK-KLEIN` dans `.github/CODEOWNERS`.
+- [ ] Protéger `main` et `develop`.
+- [ ] Créer les labels avec `./scripts/setup-github.sh`.
+- [ ] Créer les issues avec `./scripts/create-issues.sh`.
+- [ ] Vérifier qu'un membre peut ouvrir une PR vers `develop`.
+- [ ] Vérifier que la CI se déclenche sur la PR.
 
 ---
 

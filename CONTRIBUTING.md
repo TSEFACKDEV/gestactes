@@ -1,5 +1,8 @@
 # Contribuer à GestActes
 
+> **Nouveau sur le projet ?** Lis d'abord `docs/onboarding.md`, puis reviens
+> ici pour les commandes et le processus de PR.
+
 Ce document est la référence courte. Les détails sont dans :
 
 - `docs/repartition-taches.md` — qui fait quoi, branches, fichiers.
