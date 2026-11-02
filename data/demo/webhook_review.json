@@ -1,0 +1,15 @@
+{
+  "action": "submitted",
+  "review": {
+    "state": "approved",
+    "body": "Contenu conforme.",
+    "html_url": "https://github.com/owner/gestactes-data/pull/13#pullrequestreview-1"
+  },
+  "pull_request": {
+    "number": 13,
+    "html_url": "https://github.com/owner/gestactes-data/pull/13"
+  },
+  "repository": {
+    "full_name": "owner/gestactes-data"
+  }
+}

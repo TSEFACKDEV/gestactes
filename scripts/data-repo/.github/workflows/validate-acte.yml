@@ -1,0 +1,82 @@
+name: validate-acte
+
+on:
+  pull_request:
+    paths:
+      - "actes/**"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Valider les actes modifiés
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import subprocess
+          from pathlib import Path
+
+          base = os.environ.get("GITHUB_BASE_REF", "main")
+          changed = subprocess.check_output(
+              ["git", "diff", "--name-only", f"origin/{base}...HEAD"],
+              text=True,
+          ).splitlines()
+
+          acte_files = [path for path in changed if path.endswith("acte.json")]
+          if not acte_files:
+              print("Aucun acte.json modifié.")
+              raise SystemExit(0)
+
+          errors: list[str] = []
+          for path in acte_files:
+              file = Path(path)
+              try:
+                  data = json.loads(file.read_text(encoding="utf-8"))
+              except Exception as exc:
+                  errors.append(f"{path}: JSON invalide ({exc})")
+                  continue
+
+              for key in ("numero", "type", "demandeur", "donnees"):
+                  if key not in data:
+                      errors.append(f"{path}: champ obligatoire manquant '{key}'")
+
+              if "@" in json.dumps(data, ensure_ascii=False):
+                  errors.append(f"{path}: une adresse e-mail est présente")
+
+              md = file.with_name("acte.md")
+              if not md.exists():
+                  errors.append(f"{path}: acte.md manquant")
+
+              pieces = file.parent / "pieces"
+              if pieces.exists():
+                  for piece in pieces.iterdir():
+                      if piece.is_file() and piece.stat().st_size > 5 * 1024 * 1024:
+                          errors.append(f"{piece}: dépasse 5 Mo")
+
+          if errors:
+              print("Erreurs de validation :")
+              for error in errors:
+                  print(f"- {error}")
+              raise SystemExit(1)
+
+          print(f"{len(acte_files)} acte(s) valide(s).")
+          PY
+
+      - name: Vérifier la taille des pièces
+        run: |
+          find actes -type f -size +5M -print -quit | grep -q . && {
+            echo "Une pièce dépasse 5 Mo."
+            exit 1
+          } || true

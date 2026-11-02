@@ -1,0 +1,18 @@
+{
+  "numero": "2026-00042",
+  "type": "attestation-residence",
+  "demandeur": {
+    "id": 1,
+    "nom": "Ndiaye",
+    "prenom": "Awa"
+  },
+  "donnees": {
+    "adresse": "12 rue des Lilas, 75000 Ville",
+    "residence_depuis": "2021-03-01",
+    "motif": "Démarche administrative"
+  },
+  "instruction": {
+    "agent_id": 2,
+    "date_prise_en_charge": "2026-10-12T10:00:00Z"
+  }
+}

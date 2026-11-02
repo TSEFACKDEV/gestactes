@@ -1,0 +1,84 @@
+name: gestactes
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: gestactes-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-gestactes}
+      POSTGRES_USER: ${POSTGRES_USER:-gestactes}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-gestactes}
+    # Pas de port exposé : la base reste sur le réseau interne.
+    # Pour inspecter : docker compose exec db psql -U gestactes -d gestactes
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-gestactes} -d ${POSTGRES_DB:-gestactes}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./backend
+    container_name: gestactes-api
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://gestactes:gestactes@db:5432/gestactes}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8080}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  worker:
+    build:
+      context: ./backend
+    container_name: gestactes-worker
+    command: python -m app.worker.main
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://gestactes:gestactes@db:5432/gestactes}
+    volumes:
+      - ./backend:/app
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./frontend
+    container_name: gestactes-web
+    ports:
+      - "8080:80"
+    depends_on:
+      api:
+        condition: service_started
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: gestactes-mailpit
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+
+volumes:
+  pgdata:
