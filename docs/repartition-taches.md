@@ -131,7 +131,8 @@
 |---|---|
 | `docs/revue-cdc.md`, `docs/cahier-des-charges-v2.md` | TSEFACK |
 | `docs/repartition-taches.md`, `docs/guide-contribution.md` | TSEFACK |
-| `docs/github-setup.md`, `docs/api-contract.md` | TSEFACK |
+| `docs/github-setup.md`, `docs/api-contract.md`, `docs/openapi.json` | TSEFACK |
+| `CHANGELOG.md` | TSEFACK |
 | `docs/architecture.md`, `docs/workflow.md` | NDOUNGUE |
 | `docs/design-system.md` | GUEMOGNE |
 | `docs/github-integration.md` | NOLACK |
