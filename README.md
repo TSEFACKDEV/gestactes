@@ -330,6 +330,14 @@ Encadrant : **M. TCHUIGOUA CHARLU**.
 
 ## 11. Organisation Git
 
+Le dépôt local est déjà initialisé avec `main` et `develop`. Pour le publier :
+
+```bash
+git remote add origin git@github.com:<organisation>/gestactes.git
+git push -u origin main
+git push -u origin develop
+```
+
 - `main` : versions stables, uniquement alimentée par les releases.
 - `develop` : intégration continue.
 - `feat/*`, `fix/*`, `docs/*`, `chore/*` : branches courtes.

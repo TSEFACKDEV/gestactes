@@ -50,6 +50,17 @@ git checkout develop
 > Le squelette fourni contient déjà `.gitignore`, `.env.example`, la CI et les
 > templates. Ne pas committer `.env`.
 
+Si le dépôt local a déjà été initialisé (cas du squelette livré), il suffit de
+le relier à GitHub :
+
+```bash
+git remote add origin git@github.com:<organisation>/gestactes.git
+git push -u origin main
+git push -u origin develop
+```
+
+Configurer les protections de branches **après** ce premier push.
+
 ---
 
 ## 3. Labels
