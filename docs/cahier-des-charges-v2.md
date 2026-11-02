@@ -183,7 +183,7 @@ Les exigences sont identifiées par `EF-xx` et classées par priorité :
 
 | ID | Besoin | Priorité | Acteur | Critère d'acceptation |
 |---|---|---|---|---|
-| EF-18 | Consulter les actes en attente avec les différences. | Haute | Validateur | La file liste les demandes `en_validation` ; la page de revue affiche le contenu, l'historique et les différences. |
+| EF-18 | Consulter les actes en attente avec les différences. | Haute | Validateur | La file liste les demandes `en_validation` ; la page de revue affiche le contenu, l'historique et une comparaison (données sources / contenu rédigé ; versions successives en évolution). |
 | EF-19 | Approuver, demander des corrections ou rejeter. | Haute | Validateur | Approbation → `validee` ; corrections → `en_instruction` avec commentaire ; rejet → `rejetee` avec commentaire obligatoire et fermeture de la PR/Issue. |
 | EF-20 | Signer l'acte. | Haute | Validateur | La signature n'est possible qu'à l'état `validee` ; `signature.json` contient le hash SHA-256 de `acte.json` et `acte.md`, l'identité et l'horodatage ; la PR est fusionnée ; le SHA du merge est enregistré. |
 | EF-21 | Générer le PDF avec numéro unique et QR code. | Moyenne | Système | Le worker génère `acte.pdf`, le commit dans `archives/`, pose le tag `acte-<année>-<numéro>-v1` et passe la demande à `archivee`. |
