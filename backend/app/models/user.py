@@ -11,7 +11,7 @@ from datetime import datetime
 
 from sqlmodel import Field, SQLModel
 
-from app.models.base import utcnow
+from app.models.base import enum_column, utcnow
 from app.models.enums import Role
 
 
@@ -23,7 +23,10 @@ class User(SQLModel, table=True):
     password_hash: str = Field(max_length=255)
     first_name: str = Field(max_length=100)
     last_name: str = Field(max_length=100)
-    role: Role = Field(default=Role.CITOYEN, index=True)
+    role: Role = Field(
+        default=Role.CITOYEN,
+        sa_column=enum_column(Role, index=True),
+    )
     is_active: bool = Field(default=True, index=True)
     created_at: datetime = Field(default_factory=utcnow)
     updated_at: datetime = Field(default_factory=utcnow)
