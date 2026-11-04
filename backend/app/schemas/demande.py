@@ -101,3 +101,8 @@ class HistoriqueItem(BaseModel):
     message: str
     sha: str | None = None
     created_at: datetime
+
+
+class DemandeDiff(BaseModel):
+    before: str
+    after: str

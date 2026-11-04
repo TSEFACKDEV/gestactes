@@ -29,6 +29,7 @@ from app.schemas.demande import (
     DecisionRequest,
     DemandeContentUpdate,
     DemandeCreatePayload,
+    DemandeDiff,
     DemandeListItem,
     DemandeRead,
     HistoriqueItem,
@@ -166,6 +167,17 @@ def get_history(
     """Retourne la timeline de la demande."""
 
     return demande_service.get_history(session, demande_id, user)
+
+
+@router.get("/{demande_id}/diff", response_model=DemandeDiff)
+def get_diff(
+    demande_id: int,
+    user: CurrentUser,
+    session: SessionDep,
+) -> DemandeDiff:
+    """Compare les données sources au contenu rédigé."""
+
+    return demande_service.get_diff(session, demande_id, user)
 
 
 @router.get("/{demande_id}/pieces/{piece_id}", response_class=Response)

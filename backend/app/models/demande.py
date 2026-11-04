@@ -13,7 +13,7 @@ from typing import Any
 from sqlalchemy import JSON, Column
 from sqlmodel import Field, SQLModel
 
-from app.models.base import utcnow
+from app.models.base import enum_column, utcnow
 from app.models.enums import StatutDemande
 
 
@@ -24,7 +24,10 @@ class Demande(SQLModel, table=True):
     numero: str = Field(index=True, unique=True, max_length=20)
     type_acte_id: int = Field(foreign_key="types_actes.id", index=True)
     demandeur_id: int = Field(foreign_key="users.id", index=True)
-    statut: StatutDemande = Field(default=StatutDemande.DEMANDEE, index=True)
+    statut: StatutDemande = Field(
+        default=StatutDemande.DEMANDEE,
+        sa_column=enum_column(StatutDemande, index=True),
+    )
 
     donnees: dict[str, Any] = Field(
         default_factory=dict,

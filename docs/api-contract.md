@@ -358,6 +358,19 @@ Citoyen propriétaire, agent, validateur, admin.
 ]
 ```
 
+### GET `/demandes/{id}/diff`
+
+Validateur, admin. Retourne deux textes à comparer : les données sources et le
+contenu rédigé. Le MVP compare les données du formulaire au contenu courant ;
+la comparaison avec la version précédente de `acte.md` est une évolution.
+
+```json
+{
+  "before": "{\n  \"adresse\": \"12 rue des Lilas\"\n}",
+  "after": "# Attestation de résidence\n\n..."
+}
+```
+
 ### GET `/demandes/{id}/pieces/{piece_id}`
 
 Connecté, selon le périmètre. Retourne le fichier avec son `Content-Type`.

@@ -2,11 +2,12 @@
 # GestActes — commandes de développement
 # ============================================================
 
-.PHONY: help setup up down logs seed test test-back test-front lint lint-back lint-front check openapi clean
+.PHONY: help setup doctor up down logs seed test test-back test-front lint lint-back lint-front check openapi clean
 
 help:
 	@echo "GestActes — commandes disponibles"
 	@echo "  make setup       Copier .env.example vers .env si absent"
+	@echo "  make doctor      Vérifier l'environnement et les services"
 	@echo "  make up          Construire et démarrer Docker Compose"
 	@echo "  make down        Arrêter les conteneurs"
 	@echo "  make logs        Suivre les logs"
@@ -22,6 +23,9 @@ help:
 setup:
 	@test -f .env || cp .env.example .env
 	@echo "Fichier .env prêt. Remplacer les secrets avant utilisation."
+
+doctor:
+	./scripts/verify-setup.sh
 
 up:
 	docker compose up --build

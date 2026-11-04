@@ -13,7 +13,7 @@ from typing import Any
 from sqlalchemy import JSON, Column
 from sqlmodel import Field, SQLModel
 
-from app.models.base import utcnow
+from app.models.base import enum_column, utcnow
 from app.models.enums import OutboxStatus
 
 
@@ -26,7 +26,10 @@ class OutboxJob(SQLModel, table=True):
         default_factory=dict,
         sa_column=Column(JSON, nullable=False),
     )
-    status: OutboxStatus = Field(default=OutboxStatus.PENDING, index=True)
+    status: OutboxStatus = Field(
+        default=OutboxStatus.PENDING,
+        sa_column=enum_column(OutboxStatus, index=True),
+    )
     attempts: int = Field(default=0)
     last_error: str | None = Field(default=None, max_length=2000)
     run_at: datetime = Field(default_factory=utcnow, index=True)

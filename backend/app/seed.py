@@ -121,7 +121,7 @@ DEMO_TYPES: list[dict[str, Any]] = [
     {
         "code": "autorisation-administrative",
         "label": "Autorisation administrative",
-        "description": "Autorisation simple pour une démarche administratives.",
+        "description": "Autorisation simple pour une démarche administrative.",
         "form_schema": [
             {
                 "name": "objet",

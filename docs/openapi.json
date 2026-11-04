@@ -924,6 +924,54 @@
         }
       }
     },
+    "/api/v1/demandes/{demande_id}/diff": {
+      "get": {
+        "tags": [
+          "demandes"
+        ],
+        "summary": "Get Diff",
+        "description": "Compare les données sources au contenu rédigé.",
+        "operationId": "get_diff_api_v1_demandes__demande_id__diff_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "demande_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Demande Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemandeDiff"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/demandes/{demande_id}/pieces/{piece_id}": {
       "get": {
         "tags": [
@@ -2443,6 +2491,24 @@
         },
         "type": "object",
         "title": "DemandeContentUpdate"
+      },
+      "DemandeDiff": {
+        "properties": {
+          "before": {
+            "type": "string",
+            "title": "Before"
+          },
+          "after": {
+            "type": "string",
+            "title": "After"
+          }
+        },
+        "type": "object",
+        "required": [
+          "before",
+          "after"
+        ],
+        "title": "DemandeDiff"
       },
       "DemandeListItem": {
         "properties": {
