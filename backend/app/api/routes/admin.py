@@ -1,16 +1,19 @@
 """Routes d'administration.
 
 Propriétaire : KOUODZO ZANGUE REGINA
-TODO :
-  [ ] Ajouter la pagination réelle de l'audit.
-  [ ] Journaliser toutes les actions admin.
-  [ ] Tester la protection du dernier administrateur.
+Rôle : couche HTTP de /admin (utilisateurs, types d'actes, audit, statistiques).
+Toutes les routes exigent le rôle admin (`AdminUser`).
+
+Les actions sur les utilisateurs sont journalisées par `user_service` ; les
+actions sur les types d'actes, qui relèvent d'un autre service, le sont ici.
 """
+
+from datetime import date
 
 from fastapi import APIRouter, Query, Response, status
 
 from app.core.deps import AdminUser, SessionDep
-from app.models import Role, User
+from app.models import Role
 from app.schemas.admin import (
     AdminUserCreate,
     AdminUserUpdate,
@@ -25,6 +28,11 @@ from app.services import audit_service, stats_service, type_acte_service, user_s
 router = APIRouter()
 
 
+# --------------------------------------------------------------------------- #
+# Utilisateurs
+# --------------------------------------------------------------------------- #
+
+
 @router.get("/utilisateurs", response_model=Page[UserRead])
 def list_users(
     _: AdminUser,
@@ -34,7 +42,7 @@ def list_users(
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=20, ge=1, le=100),
 ) -> Page[UserRead]:
-    """Liste les utilisateurs."""
+    """Liste les utilisateurs (filtre rôle, recherche nom/prénom/e-mail)."""
 
     items, total = user_service.list_users(
         session,
@@ -61,15 +69,9 @@ def create_user(
     admin: AdminUser,
     session: SessionDep,
 ) -> UserRead:
-    """Crée un utilisateur avec un rôle."""
+    """Crée un agent, un validateur ou un administrateur (409 si e-mail pris)."""
 
-    user = user_service.create_user(session, payload)
-    audit_service.record(
-        session,
-        "admin.user.create",
-        actor_id=admin.id,
-        details={"user_id": user.id, "role": user.role.value},
-    )
+    user = user_service.create_user(session, payload, admin)
     session.commit()
     session.refresh(user)
     return UserRead.model_validate(user)
@@ -82,15 +84,9 @@ def update_user(
     admin: AdminUser,
     session: SessionDep,
 ) -> UserRead:
-    """Modifie un utilisateur."""
+    """Modifie nom, rôle ou état (409 : dernier admin, soi-même)."""
 
-    user = user_service.update_user(session, user_id, payload)
-    audit_service.record(
-        session,
-        "admin.user.update",
-        actor_id=admin.id,
-        details={"user_id": user.id, "fields": list(payload.model_dump(exclude_unset=True))},
-    )
+    user = user_service.update_user(session, user_id, payload, admin)
     session.commit()
     session.refresh(user)
     return UserRead.model_validate(user)
@@ -102,17 +98,16 @@ def deactivate_user(
     admin: AdminUser,
     session: SessionDep,
 ) -> Response:
-    """Désactive un utilisateur."""
+    """Désactive un utilisateur et révoque ses sessions."""
 
     user_service.deactivate_user(session, user_id, admin)
-    audit_service.record(
-        session,
-        "admin.user.deactivate",
-        actor_id=admin.id,
-        details={"user_id": user_id},
-    )
     session.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+# --------------------------------------------------------------------------- #
+# Types d'actes (service : NDOUNGUE)
+# --------------------------------------------------------------------------- #
 
 
 @router.get("/types-actes", response_model=list[TypeActeRead])
@@ -120,8 +115,7 @@ def list_types(_: AdminUser, session: SessionDep) -> list[TypeActeRead]:
     """Liste tous les types, actifs et inactifs."""
 
     return [
-        TypeActeRead.model_validate(type_acte)
-        for type_acte in type_acte_service.list_all(session)
+        TypeActeRead.model_validate(type_acte) for type_acte in type_acte_service.list_all(session)
     ]
 
 
@@ -189,38 +183,51 @@ def deactivate_type(
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
+# --------------------------------------------------------------------------- #
+# Audit et statistiques
+# --------------------------------------------------------------------------- #
+
+
 @router.get("/audit", response_model=Page[AuditEventRead])
 def list_audit(
     _: AdminUser,
     session: SessionDep,
     actor_id: int | None = Query(default=None),
     action: str | None = Query(default=None, max_length=100),
+    date_from: date | None = Query(default=None),
+    date_to: date | None = Query(default=None),
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=20, ge=1, le=100),
 ) -> Page[AuditEventRead]:
-    """Liste les événements d'audit."""
+    """Consulte le journal d'audit, du plus récent au plus ancien."""
 
-    events = audit_service.list_events(
+    events, total = audit_service.list_events(
         session,
         actor_id=actor_id,
         action=action,
-        limit=page_size,
+        date_from=date_from,
+        date_to=date_to,
+        page=page,
+        page_size=page_size,
     )
-    items: list[AuditEventRead] = []
-    for event in events:
-        actor = session.get(User, event.actor_id) if event.actor_id else None
-        items.append(
-            AuditEventRead(
-                id=event.id or 0,
-                demande_id=event.demande_id,
-                actor=UserSummary.model_validate(actor) if actor else None,
-                action=event.action,
-                details=event.details,
-                commit_sha=event.commit_sha,
-                created_at=event.created_at,
-            )
+    actors = audit_service.load_actors(session, events)
+    items = [
+        AuditEventRead(
+            id=event.id or 0,
+            demande_id=event.demande_id,
+            actor=(
+                UserSummary.model_validate(actors[event.actor_id])
+                if event.actor_id in actors
+                else None
+            ),
+            action=event.action,
+            details=event.details,
+            commit_sha=event.commit_sha,
+            created_at=event.created_at,
         )
-    return Page.create(items, total=len(items), page=page, page_size=page_size)
+        for event in events
+    ]
+    return Page.create(items, total=total, page=page, page_size=page_size)
 
 
 @router.get("/statistiques", response_model=StatsRead)
