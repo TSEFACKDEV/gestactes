@@ -64,3 +64,11 @@ export async function downloadPdf(id: number): Promise<Blob> {
   });
   return data;
 }
+
+/** `GET /demandes/{id}/pieces/{piece_id}` : le fichier avec son Content-Type. */
+export async function downloadPiece(id: number, pieceId: number): Promise<Blob> {
+  const { data } = await api.get<Blob>(`/demandes/${id}/pieces/${pieceId}`, {
+    responseType: "blob",
+  });
+  return data;
+}
