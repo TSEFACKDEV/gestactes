@@ -1,10 +1,6 @@
 """Réception des webhooks GitHub.
 
 Propriétaire : NOLACK KAWUNJIBI FRANGE PARKER
-TODO :
-  [ ] Traiter les événements `issues`, `pull_request`, `pull_request_review`.
-  [ ] Enfiler un job idempotent après insertion.
-  [ ] Tester la signature invalide et le rejeu.
 """
 
 import hashlib
@@ -19,6 +15,7 @@ from app.core.deps import SessionDep
 from app.core.errors import AppError
 from app.models import WebhookEvent
 from app.schemas.github import WebhookResponse
+from app.services import github_service
 
 router = APIRouter()
 
@@ -38,7 +35,7 @@ async def github_webhook(
         default=None, alias="X-Hub-Signature-256"
     ),
 ) -> WebhookResponse:
-    """Vérifie la signature HMAC et enregistre l'événement."""
+    """Vérifie la signature HMAC, gère l'idempotence et traite l'événement webhook."""
 
     if not x_github_delivery:
         raise AppError(
@@ -82,14 +79,17 @@ async def github_webhook(
             code="INVALID_PAYLOAD",
         ) from exc
 
+    event_name = x_github_event or "unknown"
     event = WebhookEvent(
         delivery_id=x_github_delivery,
-        event=x_github_event or "unknown",
+        event=event_name,
         action=payload.get("action"),
         payload=payload,
     )
     session.add(event)
     session.commit()
 
-    # TODO NOLACK : appeler github_service.handle_webhook ou enfiler un job.
+    # Traitement métier asynchrone / synchrone de l'événement webhook
+    await github_service.handle_webhook(session, event_name, payload)
+
     return WebhookResponse(status="accepted", delivery_id=x_github_delivery)
