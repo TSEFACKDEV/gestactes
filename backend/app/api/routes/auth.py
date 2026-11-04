@@ -1,10 +1,12 @@
 """Routes d'authentification et de compte.
 
 Propriétaire : KOUODZO ZANGUE REGINA
-TODO :
-  [ ] Ajouter le rate limiting sur login et forgot-password.
-  [ ] Journaliser les échecs de connexion.
-  [ ] Tester la rotation et la révocation du refresh token.
+Rôle : couche HTTP de /auth. Les routes valident l'entrée, appellent
+`auth_service`, font le `commit` et gèrent le cookie de refresh (HttpOnly).
+
+Quand le service lève une erreur après avoir écrit une trace d'audit (échec de
+connexion, rejeu de refresh token), la route commit avant de relancer l'erreur
+pour que la trace survive.
 """
 
 from fastapi import APIRouter, Request, Response, status
@@ -12,7 +14,6 @@ from fastapi import APIRouter, Request, Response, status
 from app.core.config import settings
 from app.core.deps import CurrentUser, SessionDep
 from app.core.errors import AppError
-from app.core.security import utcnow
 from app.schemas.auth import (
     ChangePasswordRequest,
     ForgotPasswordRequest,
@@ -68,10 +69,19 @@ def login(
     response: Response,
     session: SessionDep,
 ) -> TokenResponse:
-    """Authentifie l'utilisateur et pose le cookie de refresh."""
+    """Authentifie l'utilisateur et pose le cookie de refresh.
 
-    user = auth_service.authenticate(session, payload.email, payload.password)
+    401 identifiants invalides, 403 compte désactivé, 429 trop d'échecs récents.
+    """
+
+    try:
+        user = auth_service.authenticate(session, payload.email, payload.password)
+    except AppError:
+        session.commit()  # conserve la trace d'audit de l'échec
+        raise
+
     access_token, refresh_token, expires_in = auth_service.issue_tokens(session, user)
+    auth_service.purge_expired_tokens(session)
     session.commit()
     _set_refresh_cookie(response, refresh_token)
     return TokenResponse(
@@ -97,9 +107,14 @@ def refresh(
             code="MISSING_REFRESH_TOKEN",
         )
 
-    user, access_token, refresh_token, expires_in = auth_service.rotate_refresh_token(
-        session, raw_token
-    )
+    try:
+        user, access_token, refresh_token, expires_in = auth_service.rotate_refresh_token(
+            session, raw_token
+        )
+    except AppError:
+        session.commit()  # conserve la révocation et la trace en cas de rejeu
+        raise
+
     session.commit()
     _set_refresh_cookie(response, refresh_token)
     return TokenResponse(
@@ -138,11 +153,7 @@ def update_me(
 ) -> UserRead:
     """Met à jour le prénom et le nom."""
 
-    data = payload.model_dump(exclude_unset=True)
-    for field, value in data.items():
-        setattr(user, field, value)
-    user.updated_at = utcnow()
-    session.add(user)
+    auth_service.update_profile(session, user, payload)
     session.commit()
     session.refresh(user)
     return UserRead.model_validate(user)
@@ -168,7 +179,7 @@ def forgot_password(
 
 @router.post("/reset-password", status_code=status.HTTP_204_NO_CONTENT)
 def reset_password(payload: ResetPasswordRequest, session: SessionDep) -> Response:
-    """Consomme le token de reset."""
+    """Consomme le token de reset (400 si invalide, expiré ou déjà utilisé)."""
 
     auth_service.reset_password(session, payload.token, payload.new_password)
     session.commit()
@@ -178,16 +189,18 @@ def reset_password(payload: ResetPasswordRequest, session: SessionDep) -> Respon
 @router.post("/change-password", status_code=status.HTTP_204_NO_CONTENT)
 def change_password(
     payload: ChangePasswordRequest,
+    request: Request,
     user: CurrentUser,
     session: SessionDep,
 ) -> Response:
-    """Change le mot de passe de l'utilisateur connecté."""
+    """Change le mot de passe ; les autres sessions sont révoquées."""
 
     auth_service.change_password(
         session,
         user,
         payload.current_password,
         payload.new_password,
+        keep_raw_token=request.cookies.get(settings.refresh_cookie_name),
     )
     session.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)

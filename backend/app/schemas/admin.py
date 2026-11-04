@@ -1,32 +1,42 @@
 """Schémas d'administration.
 
 Propriétaire : KOUODZO ZANGUE REGINA
-TODO :
-  [ ] Ajouter les statistiques par période.
-  [ ] Tester les filtres d'audit.
+Rôle : corps et réponses des routes /admin (utilisateurs, audit, statistiques).
 """
 
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field, field_validator
 
 from app.models.enums import Role
 from app.schemas.common import ORMModel
-from app.schemas.user import UserSummary
+from app.schemas.user import CleanName, NormalizedEmail, StrongPassword, UserSummary
 
 
 class AdminUserCreate(BaseModel):
-    first_name: str = Field(min_length=1, max_length=100)
-    last_name: str = Field(min_length=1, max_length=100)
-    email: EmailStr
-    password: str = Field(min_length=8, max_length=128)
+    """Création d'un compte interne : agent, validateur ou administrateur.
+
+    Les citoyens s'inscrivent eux-mêmes via /auth/register.
+    """
+
+    first_name: CleanName = Field(min_length=1, max_length=100)
+    last_name: CleanName = Field(min_length=1, max_length=100)
+    email: NormalizedEmail
+    password: StrongPassword = Field(min_length=8, max_length=128)
     role: Role = Role.AGENT
+
+    @field_validator("role")
+    @classmethod
+    def _internal_role_only(cls, value: Role) -> Role:
+        if value == Role.CITOYEN:
+            raise ValueError("Le rôle doit être agent, validateur ou admin.")
+        return value
 
 
 class AdminUserUpdate(BaseModel):
-    first_name: str | None = Field(default=None, min_length=1, max_length=100)
-    last_name: str | None = Field(default=None, min_length=1, max_length=100)
+    first_name: CleanName | None = Field(default=None, min_length=1, max_length=100)
+    last_name: CleanName | None = Field(default=None, min_length=1, max_length=100)
     role: Role | None = None
     is_active: bool | None = None
 
