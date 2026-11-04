@@ -7,8 +7,9 @@ import { describe, expect, it } from "vitest";
 import { ToastProvider } from "@/context/ToastContext";
 import { InstructionEditor } from "@/features/agent/components/InstructionEditor";
 import { QueueFilters } from "@/features/agent/components/QueueFilters";
+import type { Demande } from "@/types";
 
-const demande = {
+const demande: Demande = {
   id: 7,
   numero: "2026-00007",
   type: { id: 1, code: "attestation-residence", label: "Attestation de résidence" },
@@ -33,7 +34,7 @@ const demande = {
   merge_commit_sha: null,
   tag_name: null,
   pieces: [],
-} as const;
+};
 
 function renderWithProviders(ui: React.ReactNode) {
   const queryClient = new QueryClient({
