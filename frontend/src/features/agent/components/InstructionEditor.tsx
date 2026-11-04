@@ -8,8 +8,8 @@
  */
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { LuSave, LuSend, LuTriangleAlert } from "react-icons/lu";
+import { useMemo, useState } from "react";
+import { LuEye, LuSave, LuSend, LuTriangleAlert } from "react-icons/lu";
 
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
@@ -68,6 +68,30 @@ export function InstructionEditor({ demande }: { demande: Demande }) {
 
   const busy = saveMutation.isPending || complementMutation.isPending || submitMutation.isPending;
 
+  const renderedPreview = useMemo(() => {
+    return acteMd
+      .split(/\n{2,}/)
+      .map((block) => {
+        const trimmed = block.trim();
+        if (!trimmed) return "";
+        if (trimmed.startsWith("#")) {
+          return `<h1>${trimmed.replace(/^#+\s*/, "")}</h1>`;
+        }
+        if (trimmed.startsWith("##")) {
+          return `<h2>${trimmed.replace(/^#+\s*/, "")}</h2>`;
+        }
+        if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
+          const items = trimmed
+            .split(/\n/)
+            .map((item) => `<li>${item.replace(/^[-*]\s*/, "")}</li>`)
+            .join("");
+          return `<ul>${items}</ul>`;
+        }
+        return `<p>${trimmed.replace(/\n/g, "<br />")}</p>`;
+      })
+      .join("");
+  }, [acteMd]);
+
   return (
     <div className="space-y-6">
       {error ? <Alert variant="danger">{error}</Alert> : null}
@@ -91,6 +115,19 @@ export function InstructionEditor({ demande }: { demande: Demande }) {
             className="font-mono text-xs leading-relaxed"
             placeholder="# Attestation de résidence..."
           />
+          <div className="rounded-lg border border-line bg-surface-muted p-4">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <p className="text-sm font-medium text-ink">Aperçu</p>
+              <span className="inline-flex items-center gap-1.5 text-xs text-ink-soft">
+                <LuEye className="h-3.5 w-3.5" aria-hidden="true" />
+                HTML simplifié
+              </span>
+            </div>
+            <div
+              className="prose prose-sm max-w-none text-sm leading-relaxed text-ink-soft"
+              dangerouslySetInnerHTML={{ __html: renderedPreview || "<p>Aucun contenu pour l’instant.</p>" }}
+            />
+          </div>
           <Textarea
             label="Message de commit"
             value={message}

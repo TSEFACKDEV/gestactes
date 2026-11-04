@@ -29,17 +29,21 @@ import type { Statut } from "@/types";
 export function AgentQueuePage() {
   const [q, setQ] = useState("");
   const [statut, setStatut] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const [page, setPage] = useState(1);
   const navigate = useNavigate();
   const toast = useToast();
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: ["agent", "queue", q, statut, page],
+    queryKey: ["agent", "queue", q, statut, dateFrom, dateTo, page],
     queryFn: () =>
       fetchQueue({
         q: q || undefined,
         statut: (statut || undefined) as Statut | undefined,
+        date_from: dateFrom || undefined,
+        date_to: dateTo || undefined,
         page,
         page_size: 20,
       }),
@@ -73,6 +77,16 @@ export function AgentQueuePage() {
         statut={statut}
         onStatutChange={(value) => {
           setStatut(value);
+          setPage(1);
+        }}
+        dateFrom={dateFrom}
+        onDateFromChange={(value) => {
+          setDateFrom(value);
+          setPage(1);
+        }}
+        dateTo={dateTo}
+        onDateToChange={(value) => {
+          setDateTo(value);
           setPage(1);
         }}
       />
