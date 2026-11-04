@@ -1,15 +1,14 @@
 /**
- * Carte de demande.
+ * Carte de demande (liste et tableau de bord).
  * Propriétaire : JEUDIEU TSAGUE AUDREY DANIELLE
- * TODO : brancher les données réelles et couvrir les états d'erreur.
  */
 
-import { LuArrowUpRight, LuCalendar } from "react-icons/lu";
+import { LuArrowUpRight, LuCalendar, LuUser } from "react-icons/lu";
 import { Link } from "react-router-dom";
 
 import { Card } from "@/components/ui/Card";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatRelative, fullName } from "@/lib/format";
 import type { DemandeListItem } from "@/types";
 
 export function RequestCard({ demande }: { demande: DemandeListItem }) {
@@ -32,8 +31,19 @@ export function RequestCard({ demande }: { demande: DemandeListItem }) {
           <StatusBadge statut={demande.statut} />
           <span className="inline-flex items-center gap-1.5 text-xs text-ink-soft">
             <LuCalendar className="h-3.5 w-3.5" aria-hidden="true" />
-            {formatDate(demande.created_at)}
+            <span>Déposée le {formatDate(demande.created_at)}</span>
           </span>
+        </div>
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-ink-soft">
+          {demande.assigned_agent ? (
+            <span className="inline-flex min-w-0 items-center gap-1.5">
+              <LuUser className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+              <span className="truncate">Agent : {fullName(demande.assigned_agent)}</span>
+            </span>
+          ) : (
+            <span />
+          )}
+          <span>Mise à jour {formatRelative(demande.updated_at)}</span>
         </div>
       </Card>
     </Link>
