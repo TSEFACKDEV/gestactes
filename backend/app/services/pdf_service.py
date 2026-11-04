@@ -4,11 +4,12 @@ Propriétaire : NOLACK KAWUNJIBI FRANGE PARKER
 """
 
 import io
+
 import qrcode
 from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image as RLImage
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+from reportlab.platypus import Image as RLImage
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
 
 from app.core.config import settings
 from app.schemas.acte import ActeContent, SignatureManifest
@@ -74,7 +75,9 @@ def generate_pdf(
     
     # En-tête officiel
     story.append(Paragraph("<b>REPUBLIQUE DU CAMEROUN</b>", body_style))
-    story.append(Paragraph("Gestion Sécurisée des Actes Administratifs (GestActes)", body_style))
+    story.append(
+        Paragraph("Gestion Sécurisée des Actes Administratifs (GestActes)", body_style)
+    )
     story.append(Spacer(1, 15))
     
     # Titre et Numéro
@@ -94,8 +97,22 @@ def generate_pdf(
     story.append(Paragraph("<b>Informations de Signature :</b>", body_style))
     if signature and signature.signataires:
         for sig in signature.signataires:
-            story.append(Paragraph(f"- Signataire ID : {sig.user_id} (Rôle : {sig.role})", body_style))
-    story.append(Paragraph(f"<b>Hash SHA-256 Acte :</b> <code>{signature.sha256_acte_json if signature else 'N/A'}</code>", body_style))
+            story.append(
+                Paragraph(
+                    f"- Signataire ID : {sig.user_id} (Rôle : {sig.role})",
+                    body_style,
+                )
+            )
+            
+    sha_text = (
+        signature.sha256_acte_json if signature else 'N/A'
+    )
+    story.append(
+        Paragraph(
+            f"<b>Hash SHA-256 Acte :</b> <code>{sha_text}</code>",
+            body_style,
+        )
+    )
     
     story.append(Spacer(1, 20))
     
@@ -104,14 +121,18 @@ def generate_pdf(
     qr_bytes = generate_qr_code_bytes(url_verif)
     qr_img = RLImage(io.BytesIO(qr_bytes), width=90, height=90)
     story.append(qr_img)
-    story.append(Paragraph(f"<font size=8>Vérifiez cet acte en scannant ce QR code ou via : {url_verif}</font>", body_style))
+    story.append(
+        Paragraph(
+            f"<font size=8>Vérifiez cet acte en scannant ce QR code ou via : {url_verif}</font>",
+            body_style,
+        )
+    )
     
     doc.build(story)
     
     pdf_data = buffer.getvalue()
     buffer.close()
     
-    # S'assure que le résultat commence bien par %PDF
     if not pdf_data.startswith(b"%PDF"):
         raise ValueError("Le document généré n'est pas un PDF valide.")
         
