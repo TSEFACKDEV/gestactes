@@ -16,8 +16,9 @@ import { describe, expect, it } from "vitest";
 import { ToastProvider } from "@/context/ToastContext";
 import { InstructionEditor } from "@/features/agent/components/InstructionEditor";
 import { QueueFilters } from "@/features/agent/components/QueueFilters";
+import type { Demande } from "@/types";
 
-const demande = {
+const demande: Demande = {
   id: 7,
   numero: "2026-00007",
   type: { id: 1, code: "attestation-residence", label: "Attestation de résidence" },
@@ -57,12 +58,11 @@ function renderWithProviders(ui: React.ReactNode) {
 }
 
 describe("parcours agent", () => {
-  it("affiche les filtres de date de la file d'instruction", async () => {
+  it("affiche les filtres de la file d'instruction", async () => {
     const user = userEvent.setup();
 
     function ControlledQueueFilters() {
       const [q, setQ] = useState("");
-      const [dateFrom, setDateFrom] = useState("");
 
       return (
         <QueueFilters
@@ -70,10 +70,6 @@ describe("parcours agent", () => {
           onQChange={setQ}
           statut=""
           onStatutChange={() => undefined}
-          dateFrom={dateFrom}
-          onDateFromChange={setDateFrom}
-          dateTo=""
-          onDateToChange={() => undefined}
         />
       );
     }
@@ -84,10 +80,7 @@ describe("parcours agent", () => {
     await user.type(searchInput, "2026-00007");
     expect(searchInput).toHaveValue("2026-00007");
 
-    const dateFrom = screen.getByLabelText(/depuis le/i);
-    await user.clear(dateFrom);
-    await user.type(dateFrom, "2026-01-01");
-    expect(dateFrom).toHaveValue("2026-01-01");
+    expect(screen.getByLabelText(/filtrer par statut/i)).toBeInTheDocument();
   });
 
   it("affiche un aperçu du contenu markdown dans l'éditeur", () => {
