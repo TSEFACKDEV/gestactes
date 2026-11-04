@@ -8,7 +8,14 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { LuBan, LuPencil, LuPlus, LuSearch, LuUsers } from "react-icons/lu";
+import {
+  LuBan,
+  LuCircleCheck,
+  LuPencil,
+  LuPlus,
+  LuSearch,
+  LuUsers,
+} from "react-icons/lu";
 
 import { Alert } from "@/components/ui/Alert";
 import { Badge } from "@/components/ui/Badge";
@@ -23,12 +30,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { Table, TBody, TD, TH, THead, TR } from "@/components/ui/Table";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
-import {
-  createUser,
-  deactivateUser,
-  fetchUsers,
-  updateUser,
-} from "@/features/admin/api";
+import { createUser, deactivateUser, fetchUsers, updateUser } from "@/features/admin/api";
 import {
   UserFormModal,
   type UserFormValues,
@@ -62,7 +64,7 @@ export function AdminUsersPage() {
   const [page, setPage] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [deactivateTarget, setDeactivateTarget] = useState<User | null>(null);
+  const [statusTarget, setStatusTarget] = useState<User | null>(null);
 
   const query = useQuery({
     queryKey: ["admin", "users", q, role, page],
@@ -92,19 +94,20 @@ export function AdminUsersPage() {
       setEditingUser(null);
       toast.success(editingUser ? "Utilisateur modifié" : "Utilisateur créé");
     },
-    onError: (error) =>
-      toast.error("Opération impossible", getApiErrorMessage(error)),
+    onError: (error) => toast.error("Opération impossible", getApiErrorMessage(error)),
   });
 
-  const deactivateMutation = useMutation({
-    mutationFn: (id: number) => deactivateUser(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
-      setDeactivateTarget(null);
-      toast.success("Compte désactivé");
+  const statusMutation = useMutation({
+    mutationFn: async ({ id, isActive }: { id: number; isActive: boolean }) => {
+      if (isActive) await updateUser(id, { is_active: true });
+      else await deactivateUser(id);
     },
-    onError: (error) =>
-      toast.error("Désactivation impossible", getApiErrorMessage(error)),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
+      setStatusTarget(null);
+      toast.success(variables.isActive ? "Compte réactivé" : "Compte désactivé");
+    },
+    onError: (error) => toast.error("Modification impossible", getApiErrorMessage(error)),
   });
 
   return (
@@ -179,7 +182,9 @@ export function AdminUsersPage() {
                   <TD className="font-medium text-ink">{fullName(user)}</TD>
                   <TD className="text-ink-soft">{user.email}</TD>
                   <TD>
-                    <Badge variant={ROLE_BADGES[user.role]}>{ROLE_LABELS[user.role]}</Badge>
+                    <Badge variant={ROLE_BADGES[user.role]}>
+                      {ROLE_LABELS[user.role]}
+                    </Badge>
                   </TD>
                   <TD>
                     {user.is_active ? (
@@ -205,11 +210,15 @@ export function AdminUsersPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        aria-label={`Désactiver ${fullName(user)}`}
-                        disabled={user.id === currentUser?.id || !user.is_active}
-                        onClick={() => setDeactivateTarget(user)}
+                        aria-label={`${user.is_active ? "Désactiver" : "Réactiver"} ${fullName(user)}`}
+                        disabled={user.id === currentUser?.id}
+                        onClick={() => setStatusTarget(user)}
                       >
-                        <LuBan className="h-4 w-4" aria-hidden="true" />
+                        {user.is_active ? (
+                          <LuBan className="h-4 w-4" aria-hidden="true" />
+                        ) : (
+                          <LuCircleCheck className="h-4 w-4" aria-hidden="true" />
+                        )}
                       </Button>
                     </div>
                   </TD>
@@ -243,30 +252,42 @@ export function AdminUsersPage() {
       />
 
       <Modal
-        open={Boolean(deactivateTarget)}
-        onClose={() => setDeactivateTarget(null)}
-        title="Désactiver ce compte ?"
-        description="L'utilisateur ne pourra plus se connecter."
+        open={Boolean(statusTarget)}
+        onClose={() => setStatusTarget(null)}
+        title={
+          statusTarget?.is_active ? "Désactiver ce compte ?" : "Réactiver ce compte ?"
+        }
+        description={
+          statusTarget?.is_active
+            ? "L'utilisateur ne pourra plus se connecter."
+            : "L'utilisateur pourra se connecter de nouveau."
+        }
         footer={
           <>
-            <Button variant="secondary" onClick={() => setDeactivateTarget(null)}>
+            <Button variant="secondary" onClick={() => setStatusTarget(null)}>
               Conserver
             </Button>
             <Button
-              variant="danger"
-              isLoading={deactivateMutation.isPending}
+              variant={statusTarget?.is_active ? "danger" : "primary"}
+              isLoading={statusMutation.isPending}
               onClick={() =>
-                deactivateTarget && deactivateMutation.mutate(deactivateTarget.id)
+                statusTarget &&
+                statusMutation.mutate({
+                  id: statusTarget.id,
+                  isActive: !statusTarget.is_active,
+                })
               }
             >
-              Désactiver
+              {statusTarget?.is_active ? "Désactiver" : "Réactiver"}
             </Button>
           </>
         }
       >
         <p className="text-sm leading-relaxed text-ink-soft">
-          Le compte de {deactivateTarget ? fullName(deactivateTarget) : "cet utilisateur"}{" "}
-          sera désactivé. Ses sessions seront révoquées.
+          Le compte de {statusTarget ? fullName(statusTarget) : "cet utilisateur"}{" "}
+          {statusTarget?.is_active
+            ? "sera désactivé. Ses sessions seront révoquées."
+            : "sera réactivé."}
         </p>
       </Modal>
     </div>
