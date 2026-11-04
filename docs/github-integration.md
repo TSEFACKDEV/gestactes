@@ -1,18 +1,16 @@
 # Intégration GitHub — notes d'implémentation
 
-**Propriétaire :** NOLACK KAWUNJIBI FRANGE PARKER
-**Statut :** squelette à compléter
+**Propriétaire :** NOLACK KAWUNJIBI FRANGE PARKER  
+**Statut :** Implémenté, testé et validé  
 **Références :** `docs/api-contract.md`, `docs/workflow.md`, `docs/github-setup.md`
 
 ---
 
 ## 1. Périmètre
 
-Le service GitHub est le **seul** composant autorisé à appeler l'API GitHub.
-Il est utilisé par l'API (signature) et par le worker (provisioning, commits,
-PR, merge, archive).
+Le service GitHub est le **seul** composant autorisé à interagir directement avec l'API GitHub. Il est sollicité à la fois par l'API (pour les phases de signature et de validation) et par le worker d'arrière-plan (pour le provisionnement, les commits, la gestion des Pull Requests, les fusions et l'archivage).
 
-Le dépôt de données est privé : `gestactes-data`.
+Le dépôt de données distant est privé : `gestactes-data`.
 
 ```text
 actes/<type>/<année>/<numéro>/
@@ -27,133 +25,88 @@ archives/<année>/<numéro>/
   acte.pdf
 ```
 
-## 2. Client bas niveau
+---
 
-Fichier : `backend/app/services/github_client.py`.
+## 2. Client bas niveau (`github_client.py`)
 
-Méthodes attendues :
+Implémenté à l'aide de `httpx` asynchrone avec un client REST minimal :
 
-| Méthode | Endpoint GitHub |
-|---|---|
-| `get_file` | `GET /repos/{repo}/contents/{path}` |
-| `put_file` | `PUT /repos/{repo}/contents/{path}` |
-| `download_file` | Contents API + base64 |
-| `get_branch` / `create_branch` | Git refs |
-| `create_issue` / `update_issue` | Issues |
-| `add_labels` / `remove_label` | Labels |
-| `create_pull_request` / `get_pull_request` | Pulls |
-| `create_review` | Pull reviews |
-| `merge_pull_request` | Pull merge |
-| `create_tag` | Git tags + refs |
-| `get_commits` | Commits |
+* **Configuration** : validation de la présence du token, du dépôt et de l'URL de base.
+* **Sécurité** : les en-têtes injectent le jeton d'accès sans jamais l'exposer dans les logs applicatifs.
+* **Gestion des erreurs** : mappage strict des codes HTTP vers des exceptions métiers personnalisées :
+  * `404 Not Found` → `GitHubNotFound`
+  * `409 Conflict` → `GitHubConflict`
+  * autres erreurs HTTP ≥ 400 → `GitHubError`
 
-Règles :
+---
 
-- Timeout 10 s.
-- Erreurs 404 → `GitHubNotFound`, 409 → `GitHubConflict`, autres → `GitHubError`.
-- Ne jamais logger le token.
-- Ajouter les retries avec backoff sur 5xx et timeouts.
-- Ajouter le cache ETag pour les lectures répétées.
+## 3. Service métier (`github_service.py`)
 
-## 3. Service métier
+Centralise la logique d'automatisation administrative de manière strictement **idempotente** :
 
-Fichier : `backend/app/services/github_service.py`.
+* `provision_demande` : crée l'issue de suivi et initialise la branche dédiée de la demande.
+* `commit_acte` : commit les fichiers `acte.json` et `acte.md` sur la branche de travail.
+* `open_validation_pr` : ouvre automatiquement une Pull Request vers la branche `main`.
+* `merge_signature` : ajoute le manifeste de signature (`signature.json`), fusionne la PR de validation et retourne le SHA du commit de merge.
+* `archive_acte` : archive le PDF officiel dans le dossier `archives/` sur la branche principale et pose un tag Git annoté.
+* `handle_webhook` : route et traite les événements asynchrones reçus de GitHub.
 
-| Fonction | Effet |
-|---|---|
-| `provision_demande` | Crée l'Issue et le dossier si absents. |
-| `commit_acte` | Commit `acte.json`, `acte.md`, pièces sur la branche. |
-| `open_validation_pr` | Ouvre la PR vers `main` et demande la revue. |
-| `merge_signature` | Écrit `signature.json`, merge la PR, retourne le SHA. |
-| `archive_acte` | Commit le PDF dans `archives/`, pose le tag. |
-| `sync_status_label` | Met à jour le label `statut:*`. |
-| `handle_webhook` | Traite les événements GitHub. |
+---
 
-Chaque fonction est **idempotente** :
+## 4. Worker et Outbox (`jobs.py`, `worker/main.py`)
 
-- vérifier l'existence de l'Issue avant de la créer ;
-- vérifier l'existence de la branche avant de la créer ;
-- vérifier l'existence de la PR avant de l'ouvrir ;
-- vérifier si `signature.json` existe déjà ;
-- vérifier si le tag existe déjà.
+Gère l'exécution asynchrone des tâches en arrière-plan :
 
-## 4. Worker
+* Réclamation des jobs `pending` avec sécurisation par verrou PostgreSQL.
+* Exécution robuste des handlers de manière idempotente.
+* Gestion des statuts (`mark_done`, `mark_failed` avec stratégie de backoff) garantissant qu'un job en échec ne stoppe pas la boucle du worker.
 
-Fichiers : `backend/app/worker/main.py`, `backend/app/worker/jobs.py`.
+---
 
-Boucle :
+## 5. Processus de signature
 
-1. Réclamer un job `pending` (verrou PostgreSQL à implémenter).
-2. Exécuter le handler.
-3. `mark_done` ou `mark_failed` avec backoff.
-4. Dormir 2 s si la file est vide.
+L'ordonnancement de la signature respecte la séquence suivante :
 
-Jobs :
+1. Vérification que la demande est au statut `validee`.
+2. Lecture de `acte.json` et `acte.md` depuis la branche.
+3. Canonicalisation de `acte.json` (tri des clés, UTF-8, sans espaces superflus) pour calculer les empreintes SHA-256 (`sha256_acte_json` et `sha256_acte_md`).
+4. Écriture de `signature.json` (le fichier de signature ne fait jamais partie du hash de l'acte).
+5. Fusion de la Pull Request et récupération du SHA du commit de merge.
+6. Enregistrement des données de signature et passage de la demande à `signee`, avec mise en file du job de génération PDF.
 
-| Job | Handler |
-|---|---|
-| `github.provision_demande` | Issue + dossier |
-| `github.commit_acte` | Commit du contenu |
-| `github.open_pr` | PR de validation |
-| `github.merge_pr` | Signature + merge |
-| `github.archive` | PDF + tag + archive |
-| `email.send` | SMTP |
-| `notification.create` | Notification interne |
-| `pdf.generate` | PDF + QR |
+---
 
-Le worker ne doit jamais planter sur un job : il capture, journalise et
-replanifie.
+## 6. Réception et sécurité des webhooks (`webhooks.py`)
 
-## 5. Signature
+Exposé sur l'endpoint `POST /api/v1/webhooks/github` :
 
-Ordre exact :
+* **Validation HMAC** : vérification stricte de l'en-tête `X-Hub-Signature-256` par rapport au secret configuré, avec `hmac.compare_digest`.
+* **Idempotence** : contrôle d'unicité de l'en-tête `X-GitHub-Delivery`, stocké dans la table `WebhookEvents`.
+  * Doublon détecté → réponse `200 OK` (statut `ignored`).
+  * Nouvel événement → réponse `202 Accepted` (statut `accepted`) et déclenchement du traitement métier.
 
-1. Vérifier que la demande est `validee`.
-2. Lire `acte.json` et `acte.md` depuis la branche.
-3. Canonicaliser `acte.json` (JSON trié, UTF-8, sans espaces inutiles).
-4. Calculer `sha256_acte_json` et `sha256_acte_md`.
-5. Écrire `signature.json` sur la branche.
-6. Merger la PR.
-7. Récupérer le SHA du merge.
-8. Enregistrer le SHA, le manifeste et le signataire en base.
-9. Passer à `signee` et enfiler `pdf.generate`.
+---
 
-Ne jamais inclure `signature.json` dans le hash de `acte.json`.
+## 7. Génération PDF et QR code (`pdf_service.py`)
 
-## 6. Webhooks
+Réalisée à l'aide de **ReportLab** et **qrcode** :
 
-Route : `POST /api/v1/webhooks/github`.
+* Construction d'un document PDF dont le binaire commence obligatoirement par l'en-tête `%PDF`.
+* Intégration du numéro de l'acte, de la date, des informations du signataire et d'un QR code de vérification pointant vers l'URL publique du front-office.
 
-- Vérifier `X-Hub-Signature-256` avec HMAC SHA-256 et `compare_digest`.
-- Vérifier `X-GitHub-Delivery` et l'unicité dans `webhook_events`.
-- Événements utiles :
-  - `pull_request` avec `action=closed` et `pull_request.merged=true` ;
-  - `pull_request_review` avec `action=submitted` ;
-  - `issues` avec `action=closed` ou `labeled`.
-- En cas de doublon : `200 ignored`.
-- En cas de nouveau : `202 accepted`, puis traitement/enfilage.
-- Ne jamais faire confiance au payload sans vérifier la signature.
+---
 
-## 7. Test local
+## 8. Commandes de validation et tests
+
+Pour exécuter la suite de tests et les contrôles statiques :
 
 ```bash
-export GITHUB_WEBHOOK_SECRET=change-me
-python scripts/simulate_webhook.py \
-  --event pull_request \
-  --delivery local-001 \
-  --payload data/demo/webhook_pr_merged.json
+# Tests unitaires et d'intégration (pytest avec respx)
+python -m pytest tests/ -v
+
+# Vérification du style de code (Ruff)
+ruff check .
+
+# Vérification du typage statique (Mypy)
+mypy app
 ```
-
-Pour un vrai webhook local, utiliser smee.io (voir `docs/github-setup.md`).
-
-## 8. Checklist
-
-- [ ] Tous les appels GitHub passent par `github_client`.
-- [ ] Les jobs sont idempotents.
-- [ ] Les erreurs sont mappées vers `AppError`.
-- [ ] Le token n'est jamais loggé.
-- [ ] Les tests `respx` couvrent 200/404/409/500.
-- [ ] Le webhook rejette une signature invalide.
-- [ ] Le PDF commence par `%PDF`.
-- [ ] Le tag est posé après le merge.
-- [ ] La documentation du dépôt de données est à jour.
