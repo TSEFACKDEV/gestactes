@@ -18,15 +18,17 @@ export function Spinner({
   size = "md",
   className,
   label = "Chargement",
+  dark = false,
 }: {
   size?: keyof typeof SIZES;
   className?: string;
   label?: string;
+  dark?: boolean;
 }) {
   return (
     <span role="status" aria-label={label} className="inline-flex">
       <LuLoaderCircle
-        className={cn("animate-spin text-primary", SIZES[size], className)}
+        className={cn("animate-spin text-primary", dark && "text-ink", SIZES[size], className)}
         aria-hidden="true"
       />
     </span>

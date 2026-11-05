@@ -5,7 +5,7 @@ import type { ActeVerification } from "./verification";
 interface MockUser extends User { password: string }
 
 const users: MockUser[] = [
-  { id: 1, nom: "Djoumessi", prenom: "M.", email: "citoyen@gestactes.cm", password: "Citoyen123", role: "citoyen", actif: true },
+  { id: 1, nom: "Djoumessi", prenom: "Marie", email: "citoyen@gestactes.cm", password: "Citoyen123", role: "citoyen", actif: true },
   { id: 2, nom: "Agent", prenom: "Test", email: "agent@gestactes.cm", password: "Agent1234", role: "agent", actif: true },
   { id: 3, nom: "Validateur", prenom: "Test", email: "validateur@gestactes.cm", password: "Valid1234", role: "validateur", actif: true },
   { id: 4, nom: "Admin", prenom: "Test", email: "admin@gestactes.cm", password: "Admin1234", role: "administrateur", actif: true },
@@ -38,6 +38,21 @@ export const mockAuth = {
     const id = refresh.split("-").pop();
     return { access_token: `mock-access-${id}` };
   },
+  async updateProfile(token: string, d: { nom: string; prenom: string }): Promise<User> {
+    await wait();
+    const u = users.find((x) => x.id === Number(token.split("-").pop()));
+    if (!u) fail("Session invalide.");
+    u!.nom = d.nom; u!.prenom = d.prenom;
+    const { password: _p, ...user } = u!;
+    return user;
+  },
+  async changePassword(token: string, current: string, next: string) {
+    await wait();
+    const u = users.find((x) => x.id === Number(token.split("-").pop()));
+    if (!u) fail("Session invalide.");
+    if (u!.password !== current) fail("Le mot de passe actuel est incorrect.");
+    u!.password = next;
+  },
   async forgot() { await wait(); },
   async reset() { await wait(); },
 };
@@ -64,4 +79,23 @@ export async function mockVerifier(numero: string): Promise<ActeVerification> {
     throw e;
   }
   return a;
+}
+
+/* ---------- Demandes fictives du citoyen (12 : 8 validées, 2 en attente, 2 rejetées) ---------- */
+import type { Demande, Statut } from "@/lib/demande";
+
+export async function mockDemandes(): Promise<Demande[]> {
+  await wait(400);
+  const types = ["Attestation de résidence", "Extrait d'acte de naissance", "Autorisation administrative"];
+  const plan: [Statut, number][] = [
+    ["demandee", 1], ["en-instruction", 3], ["archivee", 4], ["signee", 6], ["rejetee", 8], ["archivee", 11], ["signee", 13],
+    ["validee", 16], ["archivee", 19], ["rejetee", 22], ["archivee", 25], ["signee", 28],
+  ];
+  return plan.map(([statut, age], i) => ({
+    id: i + 1,
+    numero: `ACTE-2026-${String(456 - i * 7).padStart(5, "0")}`,
+    type_acte: types[i % 3],
+    statut,
+    cree_le: new Date(Date.now() - age * 86_400_000).toISOString(),
+  }));
 }

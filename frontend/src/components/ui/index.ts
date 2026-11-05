@@ -24,3 +24,20 @@ export * from "./Table";
 export * from "./Tabs";
 export * from "./Textarea";
 export * from "./Timeline";
+export {
+  BackLink,
+  Field,
+  Icon,
+  IconBolt,
+  IconCheck,
+  IconCross,
+  IconDoc,
+  IconLock,
+  IconMail,
+  IconSearch,
+  IconShield,
+  IconUser,
+  Logo,
+  LogoMark,
+  type IconName,
+} from "./ui";

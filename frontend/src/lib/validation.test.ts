@@ -35,3 +35,16 @@ describe("formulaires", () => {
     expect(forcePassword("Abcdefg1!")).toBe(4);
   });
 });
+
+import { changePasswordSchema, profileSchema } from "./validation";
+describe("profil", () => {
+  it("valide la mise à jour du profil", () => {
+    expect(profileSchema.safeParse({ prenom: "Awa", nom: "Ndiaye" }).success).toBe(true);
+    expect(profileSchema.safeParse({ prenom: "A", nom: "Ndiaye" }).success).toBe(false);
+  });
+  it("refuse un nouveau mot de passe identique à l'actuel ou mal confirmé", () => {
+    expect(changePasswordSchema.safeParse({ current: "Abcdefg1", password: "Abcdefg1", confirm: "Abcdefg1" }).success).toBe(false);
+    expect(changePasswordSchema.safeParse({ current: "Abcdefg1", password: "Nouveau123", confirm: "Autre" }).success).toBe(false);
+    expect(changePasswordSchema.safeParse({ current: "Abcdefg1", password: "Nouveau123", confirm: "Nouveau123" }).success).toBe(true);
+  });
+});

@@ -34,13 +34,15 @@ const VARIANTS: Record<Variant, { container: string; icon: typeof LuInfo }> = {
 
 export interface AlertProps {
   variant?: Variant;
+  kind?: "error" | "success" | "info";
   title?: string;
   children: ReactNode;
   className?: string;
 }
 
-export function Alert({ variant = "info", title, children, className }: AlertProps) {
-  const { container, icon: Icon } = VARIANTS[variant];
+export function Alert({ variant, kind, title, children, className }: AlertProps) {
+  const resolvedVariant = variant ?? (kind === "error" ? "danger" : kind) ?? "info";
+  const { container, icon: Icon } = VARIANTS[resolvedVariant];
   return (
     <div
       role="alert"

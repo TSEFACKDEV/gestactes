@@ -15,7 +15,15 @@ import { LuLoaderCircle } from "react-icons/lu";
 
 import { cn } from "@/lib/utils";
 
-type Variant = "primary" | "secondary" | "ghost" | "danger" | "link";
+type Variant =
+  | "primary"
+  | "secondary"
+  | "ghost"
+  | "danger"
+  | "link"
+  | "gold"
+  | "navy"
+  | "teal";
 type Size = "sm" | "md" | "lg";
 
 const VARIANTS: Record<Variant, string> = {
@@ -26,6 +34,9 @@ const VARIANTS: Record<Variant, string> = {
   ghost: "text-ink-soft hover:bg-surface-muted hover:text-ink",
   danger: "bg-danger text-white hover:bg-danger/90 shadow-sm",
   link: "text-primary underline-offset-4 hover:underline",
+  gold: "bg-accent text-white hover:bg-accent/90",
+  navy: "bg-[#123b5d] text-white hover:bg-[#0c2b45]",
+  teal: "bg-[#168c83] text-white hover:bg-[#11766f]",
 };
 
 const SIZES: Record<Size, string> = {
@@ -38,6 +49,8 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
   size?: Size;
   isLoading?: boolean;
+  loading?: boolean;
+  block?: boolean;
   leftIcon?: ReactNode;
   rightIcon?: ReactNode;
 }
@@ -49,6 +62,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       variant = "primary",
       size = "md",
       isLoading = false,
+      loading = false,
+      block = false,
       leftIcon,
       rightIcon,
       children,
@@ -61,22 +76,29 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     <button
       ref={ref}
       type={type}
-      disabled={disabled || isLoading}
+      disabled={disabled || isLoading || loading}
       className={cn(
         "inline-flex items-center justify-center rounded-md font-medium transition duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70",
-        VARIANTS[variant],
+        variant === "gold"
+          ? "bg-accent text-white hover:bg-accent/90"
+          : variant === "navy"
+            ? "bg-[#123b5d] text-white hover:bg-[#0c2b45]"
+            : variant === "teal"
+              ? "bg-[#168c83] text-white hover:bg-[#11766f]"
+              : VARIANTS[variant],
         SIZES[size],
+        block && "w-full",
         className,
       )}
       {...props}
     >
-      {isLoading ? (
+      {isLoading || loading ? (
         <LuLoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
       ) : (
         leftIcon
       )}
       {children}
-      {!isLoading ? rightIcon : null}
+      {!isLoading && !loading ? rightIcon : null}
     </button>
   ),
 );
