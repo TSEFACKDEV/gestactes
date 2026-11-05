@@ -1,8 +1,8 @@
 # Architecture GestActes
 
 **Propriétaire :** NDOUNGUE ESSOH ABEL THOMAS
-**Version :** 2.0
-**Statut :** baseline validée par l'intégrateur
+**Version :** 2.1
+**Statut :** architecture MVP proposée et alignée sur l'implémentation actuelle
 
 ---
 
@@ -86,9 +86,10 @@ Règles :
 ### 3.3 Worker
 
 Le worker est un second processus de la même image. Il réclame les jobs de la
-table `outbox_jobs` avec un verrou (`SELECT ... FOR UPDATE SKIP LOCKED`) et les
-traite un par un.
-
+ table `outbox_jobs` et les traite un par un. PostgreSQL est la cible de
+production : le claim concurrent devra utiliser
+`SELECT ... FOR UPDATE SKIP LOCKED`. Les tests SQLite utilisent le même contrat
+transactionnel, sans prétendre reproduire exactement le verrouillage PostgreSQL.
 Types de jobs :
 
 | Job | Effet |
@@ -139,6 +140,25 @@ GitHub reste la source de vérité du contenu validé, signé et archivé.
 - Cache long pour les assets hashés, pas de cache pour `index.html`.
 - Limitation de débit sur `/api/v1/auth/login` et `/api/v1/verification`.
 - En-têtes de sécurité de base.
+
+### 3.7 État d'implémentation de l'architecture
+
+| Brique | État MVP | Responsabilité |
+|---|---|---|
+| API FastAPI modulaire | Implantée | NDOUNGUE et propriétaires métier |
+| Services du domaine actes/demandes | Implantés localement | NDOUNGUE |
+| Machine à états et effet audit/outbox | Implantée dans la transaction HTTP | NDOUNGUE |
+| Schémas Pydantic et catalogue actif | Implantés | NDOUNGUE |
+| PostgreSQL, Docker Compose, outbox | Architecture cible configurée | TSEFACK et NOLACK |
+| SQLite en mémoire pour les tests | Implanté | VOUMIA |
+| Worker persistant | Boucle MVP implantée | NOLACK |
+| GitHub API, webhook, PDF, PR et merge | Contrats présents, implémentation externe en cours | NOLACK |
+| Stockage GitHub des pièces | Métadonnées et hash locaux implantés; contenu à terminer | NOLACK |
+| PDF et fichier de signature | Manifestes locaux; génération/archivage GitHub à terminer | NDOUNGUE + NOLACK |
+
+Cette distinction évite de confondre l'architecture cible et la fonctionnalité
+réellement livrée. Les écritures HTTP restent transactionnelles avec la base;
+les effets GitHub, PDF et notifications passent par `outbox_jobs` puis le worker.
 
 ## 4. Flux principaux
 
@@ -259,6 +279,16 @@ externe.
 **Décision :** `SQLModel.metadata.create_all` + seed.
 **Conséquence :** démarrage simple ; Alembic est documenté comme évolution dès
 qu'un changement de schéma en production est nécessaire.
+
+### ADR-06 — Travail local et effets externes séparés
+
+**Contexte :** GitHub, e-mail et PDF peuvent être indisponibles sans que cela
+supprime une demande déjà enregistrée.
+**Décision :** l'API valide et persiste l'état métier, puis écrit un job dans
+l'outbox ; le worker délègue les intégrations externes à `github_service` et aux
+services de notification/PDF.
+**Conséquence :** reprise possible après panne, mais une meilleure disponibilité
+ne remplacera jamais la validation du contenu ni les verrous métier.
 
 ## 7. Sécurité
 

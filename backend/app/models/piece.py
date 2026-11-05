@@ -2,9 +2,9 @@
 
 Propriétaire : NDOUNGUE ESSOH ABEL THOMAS
 TODO :
-  [ ] Nettoyer les noms de fichiers.
-  [ ] Vérifier le type MIME réel et la taille.
-  [ ] Stocker le fichier dans GitHub et garder le chemin + hash.
+  [x] Nettoyer les noms de fichiers.
+  [x] Vérifier le type MIME et la taille à la création.
+  [x] Conserver le chemin GitHub prévu et le hash de la pièce.
 """
 
 from datetime import datetime

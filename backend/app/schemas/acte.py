@@ -1,11 +1,12 @@
 """Contenu d'un acte et manifeste de signature.
 
 Propriétaire : NDOUNGUE ESSOH ABEL THOMAS
-TODO :
-  [ ] Définir la canonicalisation JSON exacte avant hash.
-  [ ] Documenter la vérification hors ligne.
+TODO réalisé :
+  [x] Canonicalisation JSON exacte définie par `canonicalize_json`.
+  [x] Vérification hors ligne documentée dans `docs/workflow.md`.
 """
 
+import json
 from datetime import datetime
 from typing import Any
 
@@ -48,3 +49,15 @@ class SignatureManifest(BaseModel):
     signe_le: datetime
     algorithme: str = "SHA-256"
     version: int = 1
+
+
+def canonicalize_json(value: Any) -> bytes:
+    """Serialize JSON canonically for offline SHA-256 verification."""
+
+    return json.dumps(
+        value,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    ).encode("utf-8")

@@ -10,9 +10,10 @@ TODO :
 import pytest
 
 from app.core.errors import AppError
-from app.models import Role, StatutDemande, User
+from app.models import Demande, Role, StatutDemande, User
 from app.services.workflow_service import (
     allowed_actions,
+    apply_transition,
     assert_transition,
     can_transition,
 )
@@ -63,3 +64,27 @@ def test_invalid_transition():
     with pytest.raises(AppError) as exc:
         assert_transition(StatutDemande.DEMANDEE, "signer", _user(Role.VALIDATEUR))
     assert exc.value.status_code == 409
+
+
+def test_apply_transition_updates_status_and_audit(session, users):
+    demande = Demande(
+        numero="2026-00002",
+        type_acte_id=1,
+        demandeur_id=users[Role.CITOYEN].id or 0,
+        statut=StatutDemande.DEMANDEE,
+    )
+    session.add(demande)
+    session.commit()
+    session.refresh(demande)
+
+    result = apply_transition(
+        session,
+        demande,
+        "prendre_en_charge",
+        users[Role.AGENT],
+        {"branch_name": "acte/2026-00002"},
+    )
+
+    assert result.statut == StatutDemande.EN_INSTRUCTION
+    assert result.assigned_agent_id == users[Role.AGENT].id
+    assert result.branch_name == "acte/2026-00002"

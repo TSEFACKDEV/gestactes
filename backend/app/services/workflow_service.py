@@ -1,18 +1,19 @@
 """Machine à états du workflow.
 
 Propriétaire : NDOUNGUE ESSOH ABEL THOMAS
-TODO :
-  [ ] Implémenter `apply_transition` avec audit + outbox.
-  [ ] Verrouiller la demande (`SELECT FOR UPDATE`) avant transition.
-  [ ] Ajouter les tests de concurrence.
+TODO réalisé :
+  [x] Implémenter `apply_transition` avec audit + outbox.
+  [x] Verrouiller la demande (`SELECT FOR UPDATE`) avant transition.
+  [ ] Ajouter les tests de concurrence sur deux sessions.
 """
 
 from typing import Any
 
-from sqlmodel import Session
+from sqlmodel import Session, select
 
 from app.core.errors import AppError
-from app.models import Demande, Role, StatutDemande, User
+from app.models import Demande, JobType, Role, StatutDemande, User
+from app.services import audit_service, outbox_service
 
 TRANSITIONS: dict[tuple[StatutDemande, str], StatutDemande] = {
     (StatutDemande.DEMANDEE, "prendre_en_charge"): StatutDemande.EN_INSTRUCTION,
@@ -79,14 +80,59 @@ def apply_transition(
     actor: User,
     payload: dict[str, Any] | None = None,
 ) -> Demande:
-    """Applique une transition et ses effets.
+    """Verrouille et applique une transition dans la transaction courante."""
 
-    TODO NDOUNGUE : mettre à jour le statut, les champs, l'audit, l'outbox
-    et les notifications dans une seule transaction.
-    """
+    if demande.id is None:
+        raise AppError("La demande n'est pas persistée.", status_code=409, code="INVALID_STATE")
 
-    raise AppError(
-        "La machine à états n'est pas encore implémentée.",
-        status_code=501,
-        code="NOT_IMPLEMENTED",
+    statement = select(Demande).where(Demande.id == demande.id).with_for_update()
+    locked = session.exec(statement).first()
+    if locked is None:
+        raise AppError("Demande introuvable.", status_code=404, code="NOT_FOUND")
+
+    target = assert_transition(locked.statut, action, actor)
+    values = payload or {}
+
+    locked.statut = target
+    if action == "prendre_en_charge":
+        locked.assigned_agent_id = actor.id
+        locked.branch_name = str(values.get("branch_name") or "") or None
+    elif action == "annuler":
+        locked.assigned_agent_id = None
+    elif action == "demander_corrections":
+        locked.complement_attendu = True
+        locked.complement_message = str(values.get("comment") or values.get("message") or "")
+    elif action == "approuver":
+        locked.assigned_validator_id = actor.id
+    elif action == "rejeter":
+        locked.rejection_reason = str(values.get("comment") or "") or None
+    elif action == "signer":
+        locked.signed_by_id = actor.id
+        locked.assigned_validator_id = actor.id
+
+    session.add(locked)
+    audit_service.record(
+        session,
+        action=f"demande.{action}",
+        actor_id=actor.id,
+        demande_id=locked.id,
+        details={"from": demande.statut.value, "to": target.value, **values},
     )
+
+    job_type_by_action = {
+        "prendre_en_charge": JobType.GITHUB_PROVISION_DEMANDE,
+        "annuler": JobType.NOTIFICATION_CREATE,
+        "soumettre": JobType.GITHUB_OPEN_PR,
+        "demander_corrections": JobType.NOTIFICATION_CREATE,
+        "approuver": JobType.NOTIFICATION_CREATE,
+        "rejeter": JobType.NOTIFICATION_CREATE,
+        "signer": JobType.GITHUB_MERGE_PR,
+        "archiver": JobType.GITHUB_ARCHIVE,
+    }
+    outbox_service.enqueue(
+        session,
+        job_type_by_action[action],
+        {"demande_id": locked.id, "action": action, **values},
+    )
+    session.flush()
+    return locked

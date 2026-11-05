@@ -181,3 +181,17 @@ Exemples :
 | `archivee -> modifier` | 409. |
 | Double clic sur `soumettre` | Une seule PR, idempotence. |
 | Deux agents prennent en charge en même temps | Un seul gagne, l'autre reçoit 409. |
+
+## 12. Vérification hors ligne du manifeste
+
+Pour vérifier un acte signé sans appeler l'API ou GitHub:
+
+1. Lire `acte.json`, `acte.md` et `signature.json`.
+2. Sérialiser `acte.json` en UTF-8 avec les clés triées, sans espace entre les
+   séparateurs JSON, et conserver `ensure_ascii=false`.
+3. Calculer SHA-256 sur ces octets : `sha256_acte_json` doit correspondre.
+4. Calculer SHA-256 sur les octets UTF-8 exacts de `acte.md`, sans transformation
+   finale ni ajout de saut de ligne.
+5. Comparer le résultat avec `sha256_acte_md`.
+6. Vérifier séparément la signature du manifest métier et l'intégrité du merge
+   GitHub lorsque les données cryptographiques sont disponibles.

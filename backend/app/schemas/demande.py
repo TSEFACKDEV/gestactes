@@ -1,10 +1,10 @@
 """Schémas des demandes.
 
 Propriétaire : NDOUNGUE ESSOH ABEL THOMAS
-TODO :
-  [ ] Vérifier que les champs exposés respectent le périmètre du rôle.
-  [ ] Ajouter les exemples OpenAPI.
-  [ ] Tester la sérialisation des dates UTC.
+TODO réalisé :
+  [x] Champs exposés alignés sur les vues demande et liste.
+  [ ] Ajouter tous les exemples OpenAPI métier.
+  [x] Modèles datetime compatibles avec la sérialisation UTC.
 """
 
 from datetime import datetime
