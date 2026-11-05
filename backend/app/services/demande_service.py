@@ -10,6 +10,7 @@ TODO réalisé :
   [x] Erreurs métier couvertes par AppError 403/404/409/422/413.
 """
 
+import asyncio
 import csv
 import hashlib
 import io
@@ -173,6 +174,12 @@ def create_demande(
             select(Demande).where(Demande.idempotency_key == idempotency_key)
         ).first()
         if existing is not None:
+            if existing.demandeur_id != demandeur.id:
+                raise AppError(
+                    "Cette clé d'idempotence appartient à un autre demandeur.",
+                    status_code=409,
+                    code="IDEMPOTENCY_CONFLICT",
+                )
             return existing
 
     type_acte = session.exec(
@@ -281,6 +288,17 @@ def list_demandes(
             (Demande.statut == StatutDemande.DEMANDEE)
             | (Demande.assigned_agent_id == user.id)
         )
+    elif user.role == Role.VALIDATEUR:
+        statement = statement.where(
+            Demande.statut.in_(
+                [
+                    StatutDemande.EN_VALIDATION,
+                    StatutDemande.VALIDEE,
+                    StatutDemande.SIGNEE,
+                    StatutDemande.ARCHIVEE,
+                ]
+            )
+        )
 
     if statut is not None:
         statement = statement.where(Demande.statut == statut)
@@ -296,9 +314,7 @@ def list_demandes(
     if date_to:
         statement = statement.where(Demande.created_at <= date_to)
 
-    count_statement = select(Demande.id)
-    count_statement = statement.with_only_columns(Demande.id)
-    total = len(list(session.exec(count_statement).all()))
+    total = len(list(session.exec(statement).all()))
     statement = (
         statement.order_by(Demande.created_at.desc())
         .offset((page - 1) * page_size)
@@ -310,13 +326,12 @@ def list_demandes(
 
 def take_charge(session: Session, demande_id: int, user: User) -> Demande:
     demande = get_demande(session, demande_id, user)
-    year = demande.numero[:4]
     return workflow_service.apply_transition(
         session,
         demande,
         "prendre_en_charge",
         user,
-        {"branch_name": f"acte/{year}-{demande.numero}"},
+        {"branch_name": f"acte/{demande.numero}"},
     )
 
 
@@ -509,11 +524,22 @@ def get_piece(
     piece = session.get(PieceJointe, piece_id)
     if piece is None or piece.demande_id != demande.id:
         raise AppError("Pièce introuvable.", status_code=404, code="NOT_FOUND")
-    raise AppError(
-        "Le contenu de la pièce n'est pas encore disponible dans le stockage GitHub.",
-        status_code=501,
-        code="PIECE_STORAGE_NOT_READY",
-    )
+    from app.services import github_service
+
+    try:
+        content = asyncio.run(
+            github_service.download_file(
+                piece.github_path,
+                demande.branch_name or "main",
+            )
+        )
+    except Exception as exc:  # pragma: no cover - dépend de GitHub
+        raise AppError(
+            "La pièce n'est pas disponible dans le stockage GitHub.",
+            status_code=502,
+            code="GITHUB_UNAVAILABLE",
+        ) from exc
+    return piece, content
 
 
 def get_pdf(session: Session, demande_id: int, user: User) -> bytes:
@@ -526,11 +552,16 @@ def get_pdf(session: Session, demande_id: int, user: User) -> bytes:
             status_code=409,
             code="INVALID_TRANSITION",
         )
-    raise AppError(
-        "La génération du PDF est en attente du service GitHub/PDF.",
-        status_code=501,
-        code="PDF_NOT_READY",
-    )
+    from app.services import github_service
+
+    try:
+        return asyncio.run(github_service.get_pdf(session, demande))
+    except Exception as exc:  # pragma: no cover - dépend de GitHub
+        raise AppError(
+            "Le PDF n'est pas encore disponible.",
+            status_code=502,
+            code="PDF_NOT_READY",
+        ) from exc
 
 
 def export_csv(

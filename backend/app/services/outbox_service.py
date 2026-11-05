@@ -4,11 +4,31 @@ Propriétaire : NOLACK KAWUNJIBI FRANGE PARKER
 """
 
 from datetime import timedelta
+from typing import Any
+
 from sqlmodel import Session, select
 
-from app.models.outbox import OutboxJob
-from app.models.enums import OutboxStatus
 from app.models.base import utcnow
+from app.models.enums import JobType, OutboxStatus
+from app.models.outbox import OutboxJob
+
+
+def enqueue(
+    session: Session,
+    job_type: JobType | str,
+    payload: dict[str, Any],
+    *,
+    run_at=None,
+) -> OutboxJob:
+    """Ajoute un job dans la transaction courante."""
+    job = OutboxJob(
+        job_type=job_type.value if isinstance(job_type, JobType) else job_type,
+        payload=payload,
+        run_at=run_at or utcnow(),
+    )
+    session.add(job)
+    session.flush()
+    return job
 
 
 def claim_next_job(session: Session, worker_id: str) -> OutboxJob | None:
@@ -26,7 +46,7 @@ def claim_next_job(session: Session, worker_id: str) -> OutboxJob | None:
     job = session.exec(statement).first()
 
     if job:
-        job.status = OutboxStatus.RUNNING
+        job.status = OutboxStatus.PROCESSING
         job.locked_at = now
         job.locked_by = worker_id
         job.attempts += 1

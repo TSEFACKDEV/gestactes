@@ -5,15 +5,14 @@ import respx
 from httpx import Response
 
 from app.models import Demande
-from app.schemas.acte import SignatureSignataire, SignatureManifest
 from app.services import github_service
-from app.models.enums import Role
 
 
 @pytest.mark.asyncio
 @respx.mock
 async def test_provision_demande(session):
     client = github_service.get_client()
+    client.token = "test-token"
 
     respx.get(f"{client.api_url}/repos/{client.repo}/git/ref/heads/main").mock(
         return_value=Response(200, json={"object": {"sha": "fake_sha_main"}})
@@ -34,6 +33,7 @@ async def test_provision_demande(session):
 @respx.mock
 async def test_archive_acte(session):
     client = github_service.get_client()
+    client.token = "test-token"
 
     # Mock l'upload du PDF sur main
     respx.put(f"{client.api_url}/repos/{client.repo}/contents/archives/acte-ACT-001.pdf").mock(

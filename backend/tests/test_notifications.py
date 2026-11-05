@@ -3,7 +3,7 @@
 Propriétaire : NOLACK KAWUNJIBI FRANGE PARKER
 """
 
-from app.models import Role, Notification
+from app.models import Role
 from app.services import notification_service
 
 
@@ -22,7 +22,7 @@ def test_empty_notifications(client, auth_headers):
 
 
 def test_create_and_read_notification(client, auth_headers, session):
-    headers = auth_headers(Role.CITOYEN)
+    auth_headers(Role.CITOYEN)
     # On récupère l'ID de l'utilisateur courant via une route ou directement
     # Test unitaire du service de création
     # Supposons un user_id de test (ex: 1)

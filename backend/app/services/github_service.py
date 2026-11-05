@@ -3,7 +3,6 @@
 Propriétaire : NOLACK KAWUNJIBI FRANGE PARKER
 """
 
-import base64
 import json
 from typing import Any
 
@@ -11,8 +10,8 @@ from sqlmodel import Session
 
 from app.core.errors import AppError
 from app.models import Demande
-from app.schemas.acte import ActeContent, SignatureManifest
-from app.services.github_client import GitHubClient, GitHubConflict, GitHubNotFound
+from app.schemas.acte import SignatureManifest
+from app.services.github_client import GitHubClient, GitHubConflict, GitHubError
 
 _client = GitHubClient()
 
@@ -42,7 +41,7 @@ async def provision_demande(session: Session, demande: Demande) -> None:
     demande_type = getattr(demande, "type", getattr(demande, "acte_type", "document"))
 
     # 2. Création de l'Issue de suivi sur GitHub
-    issue = await client.create_issue(
+    await client.create_issue(
         title=f"Demande #{demande.numero} - {demande_type}",
         body=f"Suivi de la demande administrative ID {demande.id}.",
         labels=["demande", str(demande_type)],
@@ -58,13 +57,13 @@ async def commit_acte(session: Session, demande: Demande, message: str) -> str:
     # Préparation des contenus (JSON canonique et Markdown associé)
     acte_data = {
         "numero": demande.numero,
-        "type": demande.type,
+        "type": getattr(demande, "type", f"type-{demande.type_acte_id}"),
         "demandeur": {"id": demande.demandeur_id, "nom": "", "prenom": ""},
-        "donnees": demande.payload if hasattr(demande, "payload") else {},
+        "donnees": demande.donnees,
         "instruction": {"agent_id": None},
     }
     json_content = json.dumps(acte_data, ensure_ascii=False, indent=2, sort_keys=True)
-    md_content = f"# Acte Administratif : {demande.numero}\n\nType : {demande.type}\n"
+    md_content = f"# Acte Administratif : {demande.numero}\n\nType : {getattr(demande, "type", f"type-{demande.type_acte_id}")}\n"
 
     # Récupération des SHA existants si les fichiers existent déjà (nécessaire pour l'API GitHub Contents en PUT)
     existing_json = await client.get_file(path_json, ref=branch)
@@ -171,6 +170,11 @@ async def archive_acte(session: Session, demande: Demande, pdf_bytes: bytes) -> 
             pass # Tag potentiellement existant
 
     return commit_sha
+
+
+async def download_file(path: str, ref: str = "main") -> bytes:
+    """Télécharge un fichier du dépôt de données."""
+    return await get_client().download_file(path, ref=ref)
 
 
 async def get_acte_content(session: Session, demande: Demande) -> tuple[dict[str, Any], str]:

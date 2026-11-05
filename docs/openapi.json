@@ -414,7 +414,6 @@
           "types d'actes"
         ],
         "summary": "List Types",
-        "description": "Liste les types d'actes actifs.",
         "operationId": "list_types_api_v1_types_actes_get",
         "responses": {
           "200": {
@@ -445,7 +444,6 @@
           "types d'actes"
         ],
         "summary": "Get Type",
-        "description": "Retourne un type d'acte par son code.",
         "operationId": "get_type_api_v1_types_actes__code__get",
         "security": [
           {
@@ -2104,7 +2102,7 @@
           "webhooks"
         ],
         "summary": "Github Webhook",
-        "description": "Vérifie la signature HMAC et enregistre l'événement.",
+        "description": "Vérifie la signature HMAC, gère l'idempotence et traite l'événement webhook.",
         "operationId": "github_webhook_api_v1_webhooks_github_post",
         "parameters": [
           {

@@ -4,6 +4,7 @@ Propriétaire : NOLACK KAWUNJIBI FRANGE PARKER
 """
 
 import logging
+
 from sqlmodel import Session
 
 from app.models import Notification

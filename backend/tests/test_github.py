@@ -8,7 +8,6 @@ from app.services.github_client import (
     GitHubClient,
     GitHubConflict,
     GitHubError,
-    GitHubNotFound,
 )
 
 

@@ -112,7 +112,9 @@ class GitHubClient:
 
             except (httpx.TimeoutException, httpx.NetworkError) as exc:
                 if attempt == max_retries - 1:
-                    raise GitHubError(f"Échec de connexion à GitHub après {max_retries} tentatives: {exc}")
+                    raise GitHubError(
+                        f"Échec de connexion à GitHub après {max_retries} tentatives: {exc}"
+                    ) from exc
 
             # Backoff exponentiel avant la prochaine tentative sur 5xx / timeout
             if attempt < max_retries - 1:

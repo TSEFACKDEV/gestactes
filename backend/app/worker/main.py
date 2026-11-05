@@ -56,7 +56,7 @@ async def run() -> None:
                 try:
                     # Attendre 2 secondes ou jusqu'à ce qu'un signal d'arrêt soit reçu
                     await asyncio.wait_for(_shutdown_event.wait(), timeout=2.0)
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     continue
                 break
 
