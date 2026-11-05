@@ -1,12 +1,29 @@
+/**
+ * Routage principal.
+ * Propriétaire : TSEFACK CALVIN KLEIN (intégration).
+ * TODO : maintenir les routes et les protections par rôle.
+ */
+
 import { lazy, Suspense, useEffect } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+
 import { GuestRoute, ProtectedRoute } from "@/auth/ProtectedRoute";
-import { PublicLayout } from "@/components/layout/PublicLayout";
-import { AuthLayout } from "@/components/layout/AuthLayout";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { AuthLayout } from "@/components/layout/AuthLayout";
+import { PublicLayout } from "@/components/layout/PublicLayout";
 import { Spinner } from "@/components/ui";
+import { AdminAuditPage } from "@/features/admin/pages/AuditPage";
+import { AdminDashboardPage } from "@/features/admin/pages/DashboardPage";
+import { AdminTypesPage } from "@/features/admin/pages/TypesPage";
+import { AdminUsersPage } from "@/features/admin/pages/UsersPage";
+import { AgentInstructionPage } from "@/features/agent/pages/InstructionPage";
+import { AgentQueuePage } from "@/features/agent/pages/QueuePage";
+import { NewRequestPage } from "@/features/citizen/pages/NewRequestPage";
+import { RequestDetailPage } from "@/features/citizen/pages/RequestDetailPage";
+import { NotificationsPage } from "@/features/shared/pages/NotificationsPage";
+import { ValidatorQueuePage } from "@/features/validator/pages/QueuePage";
+import { ValidatorReviewPage } from "@/features/validator/pages/ReviewPage";
 import { ForbiddenPage, NotFoundPage } from "@/pages/ErrorPages";
-import ModulePlaceholder from "@/pages/app/ModulePlaceholder";
 
 const HomePage = lazy(() => import("@/pages/public/HomePage"));
 const VerifyPage = lazy(() => import("@/pages/public/VerifyPage"));
@@ -17,32 +34,35 @@ const ForgotPasswordPage = lazy(() => import("@/pages/auth/ForgotPasswordPage"))
 const ResetPasswordPage = lazy(() => import("@/pages/auth/ResetPasswordPage"));
 const DashboardPage = lazy(() => import("@/pages/app/DashboardPage"));
 const RequestsPage = lazy(() => import("@/pages/app/RequestsPage"));
-const RequestDetailPage = lazy(() => import("@/pages/app/RequestDetailPage"));
 const ProfilePage = lazy(() => import("@/pages/app/ProfilePage"));
 
-/** Remonte en haut à chaque changement de page, ou défile jusqu'à l'ancre (#faq). */
 function ScrollManager() {
   const { pathname, hash } = useLocation();
   useEffect(() => {
     if (hash) {
-      const t = setTimeout(() => document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
-      return () => clearTimeout(t);
+      const timeout = setTimeout(
+        () =>
+          document
+            .getElementById(hash.slice(1))
+            ?.scrollIntoView({ behavior: "smooth", block: "start" }),
+        60,
+      );
+      return () => clearTimeout(timeout);
     }
     window.scrollTo({ top: 0 });
   }, [pathname, hash]);
   return null;
 }
 
-/**
- * Carte de navigation :
- *  Public      /  (accueil + FAQ #faq)  /verifier  /verifier/:numero
- *  Auth        /connexion  /inscription  /mot-de-passe-oublie  /reinitialiser
- *  Citoyen     /app  /app/demandes  /app/demandes/:id  /app/profil
- *  Agent /agent · Validateur /validateur · Admin /admin   (modules des autres membres)
- */
 export default function App() {
   return (
-    <Suspense fallback={<div className="center-page"><Spinner dark /></div>}>
+    <Suspense
+      fallback={
+        <div className="center-page">
+          <Spinner dark />
+        </div>
+      }
+    >
       <ScrollManager />
       <Routes>
         <Route element={<PublicLayout />}>
@@ -62,24 +82,48 @@ export default function App() {
         </Route>
 
         <Route element={<ProtectedRoute />}>
-          <Route element={<AppLayout />}><Route path="app/profil" element={<ProfilePage />} /></Route>
+          <Route element={<AppLayout />}>
+            <Route path="app/profil" element={<ProfilePage />} />
+            <Route path="app/notifications" element={<NotificationsPage />} />
+          </Route>
         </Route>
+
         <Route element={<ProtectedRoute roles={["citoyen"]} />}>
           <Route element={<AppLayout />}>
             <Route path="app" element={<DashboardPage />} />
             <Route path="app/demandes" element={<RequestsPage />} />
-            <Route path="app/demandes/nouvelle" element={<ModulePlaceholder titre="Faire une demande" responsable="Audrey (parcours citoyen)" />} />
+            <Route path="app/demandes/nouvelle" element={<NewRequestPage />} />
             <Route path="app/demandes/:id" element={<RequestDetailPage />} />
           </Route>
         </Route>
+
         <Route element={<ProtectedRoute roles={["agent"]} />}>
-          <Route element={<AppLayout />}><Route path="agent" element={<ModulePlaceholder titre="File des demandes" responsable="Maxime (parcours agent)" />} /></Route>
+          <Route element={<AppLayout />}>
+            <Route path="app/agent/file" element={<AgentQueuePage />} />
+            <Route path="app/agent/demandes/:id" element={<AgentInstructionPage />} />
+          </Route>
         </Route>
+
         <Route element={<ProtectedRoute roles={["validateur"]} />}>
-          <Route element={<AppLayout />}><Route path="validateur" element={<ModulePlaceholder titre="Actes à valider" responsable="l'équipe validateur" />} /></Route>
+          <Route element={<AppLayout />}>
+            <Route path="app/validation/file" element={<ValidatorQueuePage />} />
+            <Route
+              path="app/validation/demandes/:id"
+              element={<ValidatorReviewPage />}
+            />
+          </Route>
         </Route>
-        <Route element={<ProtectedRoute roles={["administrateur"]} />}>
-          <Route element={<AppLayout />}><Route path="admin" element={<ModulePlaceholder titre="Administration" responsable="l'équipe administration" />} /></Route>
+
+        <Route element={<ProtectedRoute roles={["admin"]} />}>
+          <Route element={<AppLayout />}>
+            <Route
+              path="app/admin/tableau-de-bord"
+              element={<AdminDashboardPage />}
+            />
+            <Route path="app/admin/utilisateurs" element={<AdminUsersPage />} />
+            <Route path="app/admin/types-actes" element={<AdminTypesPage />} />
+            <Route path="app/admin/audit" element={<AdminAuditPage />} />
+          </Route>
         </Route>
 
         <Route path="acces-refuse" element={<ForbiddenPage />} />

@@ -53,12 +53,14 @@ Si tu viens d'être invité sur le dépôt, ne commence pas par coder au hasard.
 
 ### Ce qui reste à implémenter
 
-- Création, liste, détail et annulation des demandes.
-- Machine à états complète : prise en charge, instruction, soumission.
-- Provisioning GitHub : Issue, branche, commits, PR.
-- Signature, merge, PDF, QR code, archive, tag.
+- Provisioning GitHub réel : Issue, branche, commits, PR, merge, tag.
+- Génération PDF et QR code en production.
 - Traitement complet des webhooks et réconciliation.
-- Tests de fonctionnalités et recette finale.
+- Téléchargement des pièces et du PDF depuis GitHub.
+- Tests d'intégration GitHub réels et recette finale.
+
+Le parcours métier est désormais branché : dépôt, prise en charge,
+instruction, soumission, validation et signature.
 
 Les détails, les branches et les critères de conformité sont dans
 `docs/repartition-taches.md`.

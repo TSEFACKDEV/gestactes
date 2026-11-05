@@ -17,7 +17,11 @@ export function QrScanner({ onDecode }: Props) {
     scanner.current = s;
     s.start({ facingMode: "environment" }, { fps: 10, qrbox: 220 }, (txt) => { cb.current(txt); }, () => undefined)
       .catch(() => { setErreur("Caméra inaccessible. Autorisez l'accès à la caméra ou saisissez le numéro."); setActif(false); });
-    return () => { s.isScanning ? s.stop().then(() => s.clear()).catch(() => undefined) : undefined; };
+    return () => {
+      if (s.isScanning) {
+        void s.stop().then(() => s.clear()).catch(() => undefined);
+      }
+    };
   }, [actif]);
 
   return (

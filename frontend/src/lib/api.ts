@@ -13,12 +13,14 @@ import axios, {
 } from "axios";
 
 import type { ApiErrorResponse, TokenResponse } from "@/types";
+import { tokenStore } from "@/lib/tokenStore";
 
 let accessToken: string | null = null;
 let refreshPromise: Promise<string | null> | null = null;
 
 export function setAccessToken(token: string | null): void {
   accessToken = token;
+  tokenStore.setAccess(token);
 }
 
 export function getAccessToken(): string | null {
@@ -59,6 +61,7 @@ async function refreshAccessToken(): Promise<string | null> {
       })
       .catch(() => {
         setAccessToken(null);
+        tokenStore.clear();
         return null;
       })
       .finally(() => {

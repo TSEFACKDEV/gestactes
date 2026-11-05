@@ -27,6 +27,7 @@ import {
 } from "@/features/agent/api";
 import { getApiErrorMessage } from "@/lib/api";
 import { formatDateTime, fullName } from "@/lib/format";
+import { actionLabel, eventDescription } from "@/lib/demande";
 
 export function AgentInstructionPage() {
   const { id: idParam } = useParams();
@@ -84,8 +85,8 @@ export function AgentInstructionPage() {
 
   const timeline: TimelineItem[] = (history.data ?? []).map((item, index) => ({
     id: `${item.type}-${item.sha ?? index}`,
-    title: item.action,
-    description: `${item.actor} — ${item.message}`,
+    title: actionLabel(item.action),
+    description: eventDescription(item.actor, item.message),
     date: formatDateTime(item.created_at),
     status: index === (history.data?.length ?? 0) - 1 ? "current" : "done",
   }));

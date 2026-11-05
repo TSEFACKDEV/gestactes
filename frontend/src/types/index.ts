@@ -28,6 +28,10 @@ export interface User extends UserSummary {
   email: string;
   is_active: boolean;
   created_at: string;
+  /** Alias utilisés par les pages publiques / profil. */
+  nom: string;
+  prenom: string;
+  actif: boolean;
 }
 
 export interface TokenResponse {

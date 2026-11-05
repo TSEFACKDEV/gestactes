@@ -37,6 +37,7 @@ import { DecisionPanel } from "@/features/validator/components/DecisionPanel";
 import { DiffViewer } from "@/features/validator/components/DiffViewer";
 import { getApiErrorMessage } from "@/lib/api";
 import { formatDateTime, fullName } from "@/lib/format";
+import { actionLabel, eventDescription } from "@/lib/demande";
 import type { DecisionType, SignatureResult } from "@/types";
 
 export function ValidatorReviewPage() {
@@ -128,8 +129,8 @@ export function ValidatorReviewPage() {
 
   const timeline: TimelineItem[] = (history.data ?? []).map((item, index) => ({
     id: `${item.type}-${item.sha ?? index}`,
-    title: item.action,
-    description: `${item.actor} — ${item.message}`,
+    title: actionLabel(item.action),
+    description: eventDescription(item.actor, item.message),
     date: formatDateTime(item.created_at),
     status: index === (history.data?.length ?? 0) - 1 ? "current" : "done",
   }));

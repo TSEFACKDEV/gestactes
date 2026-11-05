@@ -1,61 +1,87 @@
+/**
+ * Rôles, navigation et droits.
+ * Propriétaire : GUEMOGNE GERALDINE ESTHER
+ * TODO : maintenir l'alignement avec docs/api-contract.md et les tests.
+ */
+
+import type { Role, User } from "@/types";
 import type { IconName } from "@/components/ui";
 
-export type Role = "citoyen" | "agent" | "validateur" | "administrateur";
-
-export interface User {
-  id: number;
-  nom: string;
-  prenom: string;
-  email: string;
-  role: Role;
-  actif: boolean;
-}
+export type { Role, User };
 
 export const HOME_BY_ROLE: Record<Role, string> = {
   citoyen: "/app",
-  agent: "/agent",
-  validateur: "/validateur",
-  administrateur: "/admin",
+  agent: "/app/agent/file",
+  validateur: "/app/validation/file",
+  admin: "/app/admin/tableau-de-bord",
 };
 
 export const ROLE_LABEL: Record<Role, string> = {
   citoyen: "Citoyen",
   agent: "Agent",
   validateur: "Validateur",
-  administrateur: "Administrateur",
+  admin: "Administrateur",
 };
 
-export interface NavItem { to: string; label: string; icon: IconName; end?: boolean }
+export interface NavItem {
+  to: string;
+  label: string;
+  icon: IconName;
+  end?: boolean;
+}
 
-/** Menu latéral par rôle (EF-03 : l'interface n'expose que ce que le rôle permet). */
+/** Menu latéral par rôle. */
 export const NAV_BY_ROLE: Record<Role, NavItem[]> = {
   citoyen: [
     { to: "/app", label: "Tableau de bord", icon: "grid", end: true },
     { to: "/app/demandes", label: "Mes demandes", icon: "list" },
-    { to: "/verifier", label: "Vérification publique", icon: "search" },
+    { to: "/app/demandes/nouvelle", label: "Nouvelle demande", icon: "plus", end: true },
+    { to: "/app/notifications", label: "Notifications", icon: "bell" },
     { to: "/app/profil", label: "Profil", icon: "user" },
   ],
   agent: [
-    { to: "/agent", label: "File des demandes", icon: "list", end: true },
-    { to: "/verifier", label: "Vérification publique", icon: "search" },
+    { to: "/app/agent/file", label: "File d'instruction", icon: "list", end: true },
+    { to: "/app/notifications", label: "Notifications", icon: "bell" },
     { to: "/app/profil", label: "Profil", icon: "user" },
   ],
   validateur: [
-    { to: "/validateur", label: "Actes à valider", icon: "check", end: true },
-    { to: "/verifier", label: "Vérification publique", icon: "search" },
+    { to: "/app/validation/file", label: "File de validation", icon: "check", end: true },
+    { to: "/app/notifications", label: "Notifications", icon: "bell" },
     { to: "/app/profil", label: "Profil", icon: "user" },
   ],
-  administrateur: [
-    { to: "/admin", label: "Administration", icon: "grid", end: true },
-    { to: "/verifier", label: "Vérification publique", icon: "search" },
+  admin: [
+    { to: "/app/admin/tableau-de-bord", label: "Tableau de bord", icon: "grid", end: true },
+    { to: "/app/admin/utilisateurs", label: "Utilisateurs", icon: "user" },
+    { to: "/app/admin/types-actes", label: "Types d'actes", icon: "doc" },
+    { to: "/app/admin/audit", label: "Journal d'audit", icon: "list" },
+    { to: "/app/notifications", label: "Notifications", icon: "bell" },
     { to: "/app/profil", label: "Profil", icon: "user" },
   ],
 };
 
-/** Droits principaux de chaque rôle (cahier des charges §2), affichés sur le profil. */
 export const DROITS_BY_ROLE: Record<Role, string[]> = {
-  citoyen: ["Déposer une demande d'acte et joindre des pièces", "Suivre l'état et l'historique de vos demandes", "Télécharger vos actes signés", "Vérifier l'authenticité d'un acte"],
-  agent: ["Consulter la file des demandes et les prendre en charge", "Rédiger et modifier les brouillons d'actes", "Demander un complément d'information au citoyen", "Soumettre un acte à validation"],
-  validateur: ["Consulter les actes en attente avec leurs différences", "Approuver, rejeter ou demander des corrections", "Signer les actes validés", "Consulter l'historique complet d'un acte"],
-  administrateur: ["Créer, modifier et désactiver des utilisateurs", "Attribuer les rôles", "Gérer les modèles d'actes", "Consulter le journal d'audit et les statistiques"],
+  citoyen: [
+    "Déposer une demande d'acte et joindre des pièces",
+    "Suivre l'état et l'historique de vos demandes",
+    "Télécharger vos actes signés",
+    "Vérifier l'authenticité d'un acte",
+  ],
+  agent: [
+    "Consulter la file des demandes et les prendre en charge",
+    "Rédiger et modifier les brouillons d'actes",
+    "Demander un complément d'information au citoyen",
+    "Soumettre un acte à validation",
+  ],
+  validateur: [
+    "Consulter les actes en attente avec leurs différences",
+    "Approuver, rejeter ou demander des corrections",
+    "Signer les actes validés",
+    "Consulter l'historique complet d'un acte",
+  ],
+  admin: [
+    "Créer, modifier et désactiver des utilisateurs",
+    "Attribuer les rôles",
+    "Gérer les modèles d'actes",
+    "Consulter le journal d'audit et les statistiques",
+  ],
 };

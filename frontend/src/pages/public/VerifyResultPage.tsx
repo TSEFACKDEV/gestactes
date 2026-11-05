@@ -31,7 +31,7 @@ export default function VerifyResultPage() {
         {valide && error && <Alert kind="error">{messageErreur(error)}</Alert>}
         {valide && !isLoading && !error && data === null && <Introuvable numero={numero} texte="Aucun acte signé ne correspond à ce numéro. Le document n'est pas vérifiable." />}
 
-        {data && (
+        {data && data.authentique && (
           <>
             <div className="result__banner result__banner--ok">
               <Icon name="check" size={44} />
@@ -41,13 +41,17 @@ export default function VerifyResultPage() {
             <dl className="dl">
               <div><dt>Numéro de l'acte</dt><dd>{data.numero}</dd></div>
               <div><dt>Type d'acte</dt><dd>{data.type_acte}</dd></div>
-              <div><dt>Délivré le</dt><dd>{fmtDate(data.date_delivrance)}</dd></div>
+              {data.date_delivrance && <div><dt>Délivré le</dt><dd>{fmtDate(data.date_delivrance)}</dd></div>}
               {data.commune && <div><dt>Commune</dt><dd>{data.commune}</dd></div>}
               <div><dt>Statut de signature</dt><dd><span className="badge badge--success">{STATUT[data.statut]}</span></dd></div>
-              <div><dt>Empreinte SHA-256</dt><dd style={{ fontFamily: "monospace", fontSize: ".78rem" }}>{data.empreinte_sha256.slice(0, 16)}…</dd></div>
+              {data.empreinte_sha256 && <div><dt>Empreinte SHA-256</dt><dd style={{ fontFamily: "monospace", fontSize: ".78rem" }}>{data.empreinte_sha256.slice(0, 16)}…</dd></div>}
             </dl>
             <p className="privacy"><Icon name="shield" size={18} /> Aucune donnée personnelle (nom, adresse, date de naissance) n'est affichée.</p>
           </>
+        )}
+
+        {data && !data.authentique && (
+          <Introuvable numero={data.numero} texte="Cet acte n'est pas encore signé ou archivé." />
         )}
 
         <div className="stack" style={{ marginTop: "1rem" }}>

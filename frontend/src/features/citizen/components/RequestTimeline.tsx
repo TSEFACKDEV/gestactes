@@ -10,6 +10,7 @@
 import { Timeline, type TimelineItem } from "@/components/ui/Timeline";
 import { formatDateTime } from "@/lib/format";
 import type { HistoriqueItem } from "@/types";
+import { eventDescription } from "@/lib/demande";
 
 const ACTION_LABELS: Record<string, string> = {
   creation: "Demande déposée",
@@ -45,8 +46,7 @@ export function actionLabel(action: string): string {
 }
 
 function describe(item: HistoriqueItem): string {
-  const parts = [item.actor, item.message].filter((part) => part && part.trim() !== "");
-  const text = parts.join(" — ");
+  const text = eventDescription(item.actor, item.message);
   return item.type === "commit" && item.sha ? `${text} (commit ${item.sha.slice(0, 7)})` : text;
 }
 

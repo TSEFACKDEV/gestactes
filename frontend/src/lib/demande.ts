@@ -60,3 +60,41 @@ export function serieDepots(liste: Demande[], maintenant = new Date(), jours = 3
   }
   return serie;
 }
+
+/** Libellés lisibles des actions d'audit. */
+export const ACTION_LABELS: Record<string, string> = {
+  "demande.creer": "Demande déposée",
+  "demande.prendre_en_charge": "Prise en charge",
+  "demande.contenu_modifier": "Brouillon mis à jour",
+  "demande.soumettre": "Soumise à validation",
+  "demande.approuver": "Approuvée",
+  "demande.demander_corrections": "Corrections demandées",
+  "demande.rejeter": "Rejetée",
+  "demande.signer": "Signée",
+  "demande.annuler": "Annulée",
+  "demande.archiver": "Archivée",
+};
+
+export function actionLabel(action: string): string {
+  return ACTION_LABELS[action] ?? action.replaceAll("_", " ").replaceAll(".", " · ");
+}
+
+export function eventDescription(actor: string, message: string): string {
+  const raw = (message ?? "").trim();
+  if (!raw || raw === "{}") return actor;
+  try {
+    const parsed = JSON.parse(raw) as Record<string, unknown>;
+    if (parsed && typeof parsed === "object") {
+      const parts: string[] = [];
+      if (typeof parsed.comment === "string" && parsed.comment) parts.push(parsed.comment);
+      if (typeof parsed.message === "string" && parsed.message) parts.push(parsed.message);
+      if (typeof parsed.from === "string" && typeof parsed.to === "string") {
+        parts.push(`${parsed.from} → ${parsed.to}`);
+      }
+      if (parts.length > 0) return `${actor} — ${parts.join(" · ")}`;
+    }
+  } catch {
+    // Message non JSON : on l'affiche tel quel.
+  }
+  return `${actor} — ${raw}`;
+}

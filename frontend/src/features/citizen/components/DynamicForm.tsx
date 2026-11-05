@@ -183,6 +183,7 @@ export function DynamicForm({
             <Textarea
               key={field.name}
               id={id}
+              name={field.name}
               label={field.label}
               required={field.required}
               disabled={disabled}
@@ -200,6 +201,7 @@ export function DynamicForm({
             <Select
               key={field.name}
               id={id}
+              name={field.name}
               label={field.label}
               required={field.required}
               disabled={disabled}
@@ -217,6 +219,7 @@ export function DynamicForm({
           <Input
             key={field.name}
             id={id}
+            name={field.name}
             label={field.label}
             type={field.type === "number" ? "number" : field.type === "date" ? "date" : "text"}
             inputMode={field.type === "number" ? "decimal" : undefined}

@@ -1,18 +1,53 @@
+/**
+ * API des demandes côté citoyen.
+ * Propriétaire : JEUDIEU TSAGUE AUDREY DANIELLE
+ * TODO : brancher les actions d'annulation et de téléchargement.
+ */
+
 import { api, USE_MOCK } from "./client";
 import { mockDemandes } from "./mock";
-import type { Demande } from "@/lib/demande";
+import type { Demande, Statut } from "@/lib/demande";
+import type { Page, Statut as BackendStatut } from "@/types";
 
-/**
- * Contrat avec le service Actes / Workflow (parcours citoyen) :
- *   GET /demandes        → Demande[]   (les demandes du citoyen connecté)
- *   GET /demandes/{id}   → Demande
- */
+interface BackendDemande {
+  id: number;
+  numero: string;
+  type: { label: string };
+  statut: BackendStatut;
+  created_at: string;
+}
+
+function toFrontendStatut(statut: BackendStatut): Statut {
+  return statut.replaceAll("_", "-") as Statut;
+}
+
+function mapDemande(demande: BackendDemande): Demande {
+  return {
+    id: demande.id,
+    numero: demande.numero,
+    type_acte: demande.type.label,
+    statut: toFrontendStatut(demande.statut),
+    cree_le: demande.created_at,
+  };
+}
+
 export async function listDemandes(): Promise<Demande[]> {
   if (USE_MOCK) return mockDemandes();
-  return (await api.get<Demande[]>("/demandes")).data;
+  const { data } = await api.get<Page<BackendDemande>>("/demandes", {
+    params: { page: 1, page_size: 100 },
+  });
+  return data.items.map(mapDemande);
 }
 
 export async function getDemande(id: number): Promise<Demande | null> {
-  const liste = await listDemandes();
-  return liste.find((d) => d.id === id) ?? null;
+  if (USE_MOCK) {
+    const liste = await mockDemandes();
+    return liste.find((demande) => demande.id === id) ?? null;
+  }
+  try {
+    const { data } = await api.get<BackendDemande>(`/demandes/${id}`);
+    return mapDemande(data);
+  } catch {
+    return null;
+  }
 }

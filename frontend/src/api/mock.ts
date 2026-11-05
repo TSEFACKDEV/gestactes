@@ -5,10 +5,10 @@ import type { ActeVerification } from "./verification";
 interface MockUser extends User { password: string }
 
 const users: MockUser[] = [
-  { id: 1, nom: "Djoumessi", prenom: "Marie", email: "citoyen@gestactes.cm", password: "Citoyen123", role: "citoyen", actif: true },
-  { id: 2, nom: "Agent", prenom: "Test", email: "agent@gestactes.cm", password: "Agent1234", role: "agent", actif: true },
-  { id: 3, nom: "Validateur", prenom: "Test", email: "validateur@gestactes.cm", password: "Valid1234", role: "validateur", actif: true },
-  { id: 4, nom: "Admin", prenom: "Test", email: "admin@gestactes.cm", password: "Admin1234", role: "administrateur", actif: true },
+  { id: 1, nom: "Djoumessi", prenom: "Marie", first_name: "Marie", last_name: "Djoumessi", email: "citoyen@gestactes.cm", password: "Citoyen123", role: "citoyen", actif: true, is_active: true, created_at: "2026-01-01T00:00:00Z" },
+  { id: 2, nom: "Agent", prenom: "Test", first_name: "Test", last_name: "Agent", email: "agent@gestactes.cm", password: "Agent1234", role: "agent", actif: true, is_active: true, created_at: "2026-01-01T00:00:00Z" },
+  { id: 3, nom: "Validateur", prenom: "Test", first_name: "Test", last_name: "Validateur", email: "validateur@gestactes.cm", password: "Valid1234", role: "validateur", actif: true, is_active: true, created_at: "2026-01-01T00:00:00Z" },
+  { id: 4, nom: "Admin", prenom: "Test", first_name: "Test", last_name: "Admin", email: "admin@gestactes.cm", password: "Admin1234", role: "admin", actif: true, is_active: true, created_at: "2026-01-01T00:00:00Z" },
 ];
 
 const wait = (ms = 600) => new Promise((r) => setTimeout(r, ms));
@@ -24,7 +24,19 @@ export const mockAuth = {
   async register(d: { nom: string; prenom: string; email: string; password: string }) {
     await wait();
     if (users.some((u) => u.email === d.email.toLowerCase())) fail("Un compte existe déjà avec cet e-mail.");
-    users.push({ id: users.length + 1, nom: d.nom, prenom: d.prenom, email: d.email.toLowerCase(), password: d.password, role: "citoyen" as Role, actif: true });
+    users.push({
+      id: users.length + 1,
+      nom: d.nom,
+      prenom: d.prenom,
+      first_name: d.prenom,
+      last_name: d.nom,
+      email: d.email.toLowerCase(),
+      password: d.password,
+      role: "citoyen" as Role,
+      actif: true,
+      is_active: true,
+      created_at: new Date().toISOString(),
+    });
   },
   async me(token: string): Promise<User> {
     await wait(200);

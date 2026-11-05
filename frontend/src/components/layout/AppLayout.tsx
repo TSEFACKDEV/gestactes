@@ -42,7 +42,12 @@ export function AppLayout() {
         </div>
         <nav aria-label="Navigation de l'espace">
           {NAV_BY_ROLE[user.role].map((i) => (
-            <NavLink key={i.to} to={i.to} end={i.to === "/app" || i.to === "/verifier"}>
+            <NavLink
+              key={i.to}
+              to={i.to}
+              end={i.end ?? (i.to === "/app" || i.to === "/verifier")}
+              className={({ isActive }) => (isActive ? "active" : undefined)}
+            >
               <Icon name={i.icon as IconName} />{i.label}
             </NavLink>
           ))}

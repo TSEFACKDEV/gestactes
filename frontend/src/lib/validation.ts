@@ -37,7 +37,7 @@ export const resetSchema = z
 export type ResetForm = z.infer<typeof resetSchema>;
 
 /** Numéro d'acte : ACTE-AAAA-NNNNN (ex. ACTE-2026-00042). */
-export const NUMERO_REGEX = /^ACTE-\d{4}-\d{5}$/;
+export const NUMERO_REGEX = /^(?:ACTE-)?\d{4}-\d{5}$/;
 
 export function normaliserNumero(valeur: string): string {
   return valeur.trim().toUpperCase();
@@ -49,7 +49,7 @@ export function numeroValide(valeur: string): boolean {
 
 /** Extrait un numéro d'acte depuis le contenu d'un QR code (URL de vérification ou numéro brut). */
 export function extraireNumeroDepuisQr(contenu: string): string | null {
-  const m = contenu.toUpperCase().match(/ACTE-\d{4}-\d{5}/);
+  const m = contenu.toUpperCase().match(/ACTE-\d{4}-\d{5}|\b\d{4}-\d{5}\b/);
   return m ? m[0] : null;
 }
 
