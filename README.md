@@ -365,6 +365,7 @@ python scripts/simulate_webhook.py \
 | `docs/tests.md` | Stratégie de tests. |
 | `docs/recette.md` | Scénarios de recette. |
 | `docs/demo.md` | Script de démonstration. |
+| `docs/rapport-integration.md` | Rapport de réconciliation des travaux. |
 
 ---
 
