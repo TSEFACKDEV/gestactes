@@ -11,7 +11,8 @@ import { loginSchema, LoginForm } from "@/lib/validation";
 export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const from = (useLocation().state as { from?: string } | null)?.from;
+  const state = useLocation().state as { from?: string; inscrit?: boolean } | null;
+  const from = state?.from;
   const [erreur, setErreur] = useState<string>();
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginForm>({ resolver: zodResolver(loginSchema) });
 
@@ -27,6 +28,7 @@ export default function LoginPage() {
     <>
       <h1>Connexion</h1>
       <p className="auth__sub">Accédez à votre compte</p>
+      {state?.inscrit && <Alert kind="success">Compte créé. Connectez-vous pour continuer.</Alert>}
       {erreur && <Alert kind="error">{erreur}</Alert>}
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <Field label="Adresse e-mail" type="email" autoComplete="email" icon={<IconMail />} error={errors.email?.message} {...register("email")} />
@@ -38,7 +40,7 @@ export default function LoginPage() {
         <Button type="submit" block loading={isSubmitting}>Se connecter</Button>
       </form>
       <div className="divider">ou</div>
-      <p className="auth__foot"><Link to="/inscription">Créer un compte</Link></p>
+      <Link className="btn btn--ghost btn--block" to="/inscription">Créer un compte</Link>
     </>
   );
 }

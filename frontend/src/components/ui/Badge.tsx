@@ -8,7 +8,15 @@ import type { HTMLAttributes } from "react";
 
 import { cn } from "@/lib/utils";
 
-type Variant = "neutral" | "primary" | "success" | "warning" | "danger" | "info";
+type Variant =
+  | "neutral"
+  | "primary"
+  | "success"
+  | "warning"
+  | "danger"
+  | "info"
+  | "teal"
+  | "navy";
 
 const VARIANTS: Record<Variant, string> = {
   neutral: "bg-surface-muted text-ink-soft",
@@ -17,6 +25,8 @@ const VARIANTS: Record<Variant, string> = {
   warning: "bg-warning-soft text-warning",
   danger: "bg-danger-soft text-danger",
   info: "bg-info-soft text-info",
+  teal: "bg-[#e6f4f2] text-[#168c83]",
+  navy: "bg-[#eaf2f8] text-[#123b5d]",
 };
 
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {

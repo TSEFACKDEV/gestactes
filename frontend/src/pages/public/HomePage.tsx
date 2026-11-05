@@ -1,49 +1,59 @@
 import { Link } from "react-router-dom";
-import { IconBolt, IconLock, IconShield, IconSearch } from "@/components/ui";
-
-function Facade() {
-  return (
-    <svg viewBox="0 0 360 260" width="100%" role="img" aria-label="Illustration d'un bâtiment administratif">
-      <rect x="20" y="230" width="320" height="12" fill="#D9A441" />
-      <path d="M40 90h280L180 30z" fill="#EAF2F8" />
-      <circle cx="180" cy="66" r="12" fill="#168C83" />
-      <rect x="50" y="96" width="260" height="14" fill="#fff" />
-      {[70, 120, 170, 220, 270].map((x) => <rect key={x} x={x} y="114" width="20" height="108" rx="3" fill="#EAF2F8" opacity=".92" />)}
-      <rect x="40" y="222" width="280" height="10" fill="#fff" />
-      <rect x="165" y="170" width="30" height="52" rx="4" fill="#123B5D" />
-    </svg>
-  );
-}
+import { Icon } from "@/components/ui";
+import { Faq } from "@/components/ui/Faq";
 
 export default function HomePage() {
   return (
     <>
-      <section className="hero">
+      <section className="hero" aria-labelledby="titre-hero">
+        <img className="hero__bg" src="/images/hotel-de-ville.webp" srcSet="/images/hotel-de-ville-800.webp 800w, /images/hotel-de-ville.webp 1200w" sizes="100vw"
+          width={1200} height={1600} alt="" {...({ fetchpriority: "high" } as Record<string, string>)} decoding="async" />
         <div className="hero__in">
           <div>
-            <h1>Vérifiez l'authenticité de vos actes administratifs</h1>
-            <p>Un service fiable, rapide et sécurisé pour tous les citoyens. Demandez un acte en ligne, suivez son traitement et contrôlez sa validité en quelques secondes.</p>
+            <span className="eyebrow">Service public numérique</span>
+            <h1 id="titre-hero">Vérifiez l'<em>authenticité</em> de vos actes administratifs</h1>
+            <p className="hero__lead">Un service fiable, rapide et sécurisé pour tous les citoyens camerounais. Demandez un acte en ligne, suivez son traitement et contrôlez sa validité en quelques secondes.</p>
             <div className="hero__cta">
-              <Link className="btn btn--gold" to="/verifier"><IconSearch /> Vérifier un acte</Link>
-              <Link className="btn btn--ghost" style={{ color: "#fff", borderColor: "rgba(255,255,255,.5)" }} to="/connexion">Se connecter</Link>
+              <Link className="btn btn--gold" to="/inscription">Faire une demande</Link>
+              <Link className="btn btn--outline-light" to="/connexion">Se connecter</Link>
+            </div>
+            <div className="hero__trust">
+              <span><Icon name="shield" size={18} /> Signature horodatée</span>
+              <span><Icon name="lock" size={18} /> Données protégées</span>
+              <span><Icon name="clock" size={18} /> Résultat immédiat</span>
             </div>
           </div>
-          <div className="hero__art"><Facade /></div>
+
         </div>
       </section>
 
       <div className="assurances">
-        <div className="assurance"><span className="assurance__ico"><IconShield /></span><div><strong>Authenticité garantie</strong><span>Empreinte SHA-256 et signature horodatée</span></div></div>
-        <div className="assurance"><span className="assurance__ico"><IconBolt /></span><div><strong>Accès rapide</strong><span>Un numéro ou un QR code suffit</span></div></div>
-        <div className="assurance"><span className="assurance__ico"><IconLock /></span><div><strong>Sécurité</strong><span>Données personnelles protégées</span></div></div>
+        <div className="assurance"><span className="assurance__ico"><Icon name="shield" size={24} /></span><div><strong>Authenticité garantie</strong><span className="t">Empreinte SHA-256 et signature horodatée</span></div></div>
+        <div className="assurance"><span className="assurance__ico"><Icon name="bolt" size={24} /></span><div><strong>Accès rapide</strong><span className="t">Un numéro ou un QR code suffit</span></div></div>
+        <div className="assurance"><span className="assurance__ico"><Icon name="lock" size={24} /></span><div><strong>Sécurité</strong><span className="t">Données personnelles protégées</span></div></div>
       </div>
 
-      <section className="section">
-        <h2>Comment ça marche</h2>
+      <section className="section" aria-labelledby="t-how">
+        <div className="section__head"><h2 id="t-how">Comment ça marche</h2><p>Trois étapes, du dépôt de la demande à l'acte signé.</p></div>
         <div className="steps">
-          <div className="card"><h3>1. Créez votre compte</h3><p>Inscrivez-vous gratuitement avec votre e-mail pour déposer des demandes d'actes.</p></div>
-          <div className="card"><h3>2. Suivez votre demande</h3><p>Une attestation de résidence, un extrait de naissance ou une autorisation : suivez chaque étape.</p></div>
-          <div className="card"><h3>3. Vérifiez un acte</h3><p>Chacun peut contrôler un acte signé avec son numéro, sans avoir besoin de compte.</p></div>
+          <div className="card step"><div className="step__n">1</div><h3>Créez votre compte</h3><p>Inscrivez-vous gratuitement avec votre e-mail pour déposer vos demandes d'actes.</p></div>
+          <div className="card step"><div className="step__n">2</div><h3>Suivez votre demande</h3><p>Attestation de résidence, extrait de naissance ou autorisation : suivez chaque étape du traitement.</p></div>
+          <div className="card step"><div className="step__n">3</div><h3>Récupérez et vérifiez</h3><p>Téléchargez votre acte signé. Toute personne peut en contrôler l'authenticité.</p></div>
+        </div>
+      </section>
+
+      <section className="section" id="faq" aria-labelledby="t-faq">
+        <div className="section__head"><h2 id="t-faq">Questions fréquentes</h2><p>Les réponses aux questions les plus courantes sur la vérification des actes.</p></div>
+        <Faq />
+      </section>
+
+      <section className="section">
+        <div className="cta-band">
+          <div><h2>Prêt à faire votre demande ?</h2><p>Créez un compte citoyen en moins d'une minute.</p></div>
+          <div className="row">
+            <Link className="btn btn--gold" to="/inscription">Créer un compte</Link>
+            <Link className="btn btn--outline-light" to="/connexion">Se connecter</Link>
+          </div>
         </div>
       </section>
     </>

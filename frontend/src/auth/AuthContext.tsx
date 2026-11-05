@@ -10,6 +10,7 @@ interface AuthState {
   loading: boolean;
   login: (email: string, password: string, remember: boolean) => Promise<User>;
   logout: () => void;
+  updateUser: (u: User) => void;
 }
 
 const Ctx = createContext<AuthState | null>(null);
@@ -61,7 +62,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return me;
   }, []);
 
-  const value = useMemo(() => ({ user, loading, login, logout }), [user, loading, login, logout]);
+  const updateUser = useCallback((u: User) => setUser(u), []);
+  const value = useMemo(() => ({ user, loading, login, logout, updateUser }), [user, loading, login, logout, updateUser]);
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 

@@ -62,3 +62,15 @@ export function forcePassword(p: string): number {
   if (/[^A-Za-z0-9]/.test(p) || p.length >= 12) s++;
   return s;
 }
+
+export const profileSchema = z.object({
+  prenom: z.string().trim().min(2, "Saisissez votre prénom."),
+  nom: z.string().trim().min(2, "Saisissez votre nom."),
+});
+export type ProfileForm = z.infer<typeof profileSchema>;
+
+export const changePasswordSchema = z
+  .object({ current: z.string().min(1, "Saisissez votre mot de passe actuel."), password: passwordRule, confirm: z.string().min(1, "Confirmez le nouveau mot de passe.") })
+  .refine((d) => d.password === d.confirm, { path: ["confirm"], message: "Les mots de passe ne correspondent pas." })
+  .refine((d) => d.password !== d.current, { path: ["password"], message: "Le nouveau mot de passe doit être différent de l'actuel." });
+export type ChangePasswordForm = z.infer<typeof changePasswordSchema>;
