@@ -90,7 +90,8 @@ def apply_transition(
     if locked is None:
         raise AppError("Demande introuvable.", status_code=404, code="NOT_FOUND")
 
-    target = assert_transition(locked.statut, action, actor)
+    previous_statut = locked.statut
+    target = assert_transition(previous_statut, action, actor)
     values = payload or {}
 
     locked.statut = target
@@ -116,7 +117,7 @@ def apply_transition(
         action=f"demande.{action}",
         actor_id=actor.id,
         demande_id=locked.id,
-        details={"from": demande.statut.value, "to": target.value, **values},
+        details={"from": previous_statut.value, "to": target.value, **values},
     )
 
     job_type_by_action = {
