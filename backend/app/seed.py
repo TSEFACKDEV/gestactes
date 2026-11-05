@@ -858,17 +858,8 @@ def seed_all(session: Session) -> None:
                 role=item["role"],
             )
             session.add(user)
-        else:
-            user.first_name = item["first_name"]
-            user.last_name = item["last_name"]
-            user.role = item["role"]
-            user.is_active = True
-            # Le mot de passe de démonstration reste toujours valide.
-            from app.core.security import verify_password
-
-            if not verify_password(settings.seed_password, user.password_hash):
-                user.password_hash = hash_password(settings.seed_password)
-            session.add(user)
+        # Un utilisateur existant n'est jamais écrasé : le seed peut tourner
+        # à chaque démarrage sans annuler les modifications de l'administrateur.
         users[email] = user
 
     types: dict[str, TypeActe] = {}
@@ -879,11 +870,7 @@ def seed_all(session: Session) -> None:
         if type_acte is None:
             type_acte = TypeActe(**item)
             session.add(type_acte)
-        else:
-            for field, value in item.items():
-                setattr(type_acte, field, value)
-            type_acte.is_active = True
-            session.add(type_acte)
+        # Même logique pour les types d'actes : seuls les manquants sont créés.
         types[item["code"]] = type_acte
 
     session.commit()
