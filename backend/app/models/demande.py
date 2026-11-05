@@ -2,9 +2,9 @@
 
 Propriétaire : NDOUNGUE ESSOH ABEL THOMAS
 TODO :
-  [ ] Vérifier la génération du numéro (flush + id) et l'unicité.
-  [ ] Ajouter les transitions de statut dans workflow_service.
-  [ ] Tester la concurrence sur la prise en charge.
+  [x] Vérifier la génération du numéro (flush + id) et l'unicité.
+  [x] Ajouter les transitions de statut dans workflow_service.
+  [ ] Tester la concurrence sur la prise en charge avec deux sessions.
 """
 
 from datetime import datetime
@@ -13,7 +13,7 @@ from typing import Any
 from sqlalchemy import JSON, Column
 from sqlmodel import Field, SQLModel
 
-from app.models.base import enum_column, utcnow
+from app.models.base import utcnow
 from app.models.enums import StatutDemande
 
 
@@ -24,10 +24,7 @@ class Demande(SQLModel, table=True):
     numero: str = Field(index=True, unique=True, max_length=20)
     type_acte_id: int = Field(foreign_key="types_actes.id", index=True)
     demandeur_id: int = Field(foreign_key="users.id", index=True)
-    statut: StatutDemande = Field(
-        default=StatutDemande.DEMANDEE,
-        sa_column=enum_column(StatutDemande, index=True),
-    )
+    statut: StatutDemande = Field(default=StatutDemande.DEMANDEE, index=True)
 
     donnees: dict[str, Any] = Field(
         default_factory=dict,

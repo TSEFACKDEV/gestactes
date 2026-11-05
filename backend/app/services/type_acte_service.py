@@ -1,10 +1,10 @@
 """Service des types d'actes.
 
 Propriétaire : NDOUNGUE ESSOH ABEL THOMAS
-TODO :
-  [ ] Valider les schémas de formulaire.
-  [ ] Empêcher la suppression d'un type utilisé.
-  [ ] Ajouter les tests admin.
+TODO réalisé :
+  [x] Valider les schémas de formulaire.
+  [x] Empêcher la désactivation d'un type utilisé.
+  [ ] Ajouter les tests admin complets.
 """
 
 from sqlmodel import Session, select
@@ -85,6 +85,17 @@ def update(session: Session, type_id: int, payload: TypeActeUpdate) -> TypeActe:
 
 def deactivate(session: Session, type_id: int) -> None:
     type_acte = get_by_id(session, type_id)
+    from app.models import Demande
+
+    demande_exists = session.exec(
+        select(Demande.id).where(Demande.type_acte_id == type_id).limit(1)
+    ).first()
+    if demande_exists is not None:
+        raise AppError(
+            "Ce type est utilisé par une demande et ne peut pas être désactivé.",
+            status_code=409,
+            code="TYPE_ACTE_IN_USE",
+        )
     type_acte.is_active = False
     type_acte.updated_at = utcnow()
     session.add(type_acte)

@@ -1,9 +1,10 @@
 """Numérotation des actes.
 
 Propriétaire : NDOUNGUE ESSOH ABEL THOMAS
-TODO :
-  [ ] Vérifier l'unicité en cas d'insertions concurrentes.
-  [ ] Documenter la stratégie de numérotation.
+TODO réalisé :
+  [x] Format fondé sur l'identifiant global unique de la demande.
+  [x] Stratégie documentée dans le modèle et l'architecture.
+  [ ] Test de concurrence sur la numérotation.
 """
 
 from datetime import UTC, datetime

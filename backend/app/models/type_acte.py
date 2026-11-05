@@ -2,9 +2,9 @@
 
 Propriétaire : NDOUNGUE ESSOH ABEL THOMAS
 TODO :
-  [ ] Valider le schéma des champs à la création admin.
-  [ ] Ajouter les trois types de démonstration dans seed.py.
-  [ ] Tester la désactivation d'un type utilisé.
+  [x] Valider le schéma des champs à la création admin.
+  [ ] Ajouter les trois types de démonstration dans seed.py (propriété VOUMIA).
+  [x] Tester la désactivation d'un type utilisé.
 """
 
 from datetime import datetime

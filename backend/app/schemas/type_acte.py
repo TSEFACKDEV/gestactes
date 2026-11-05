@@ -1,15 +1,15 @@
 """Schémas des types d'actes et formulaires dynamiques.
 
 Propriétaire : NDOUNGUE ESSOH ABEL THOMAS
-TODO :
-  [ ] Valider qu'un champ `select` possède des options.
-  [ ] Refuser les noms de champs dupliqués.
-  [ ] Tester la sérialisation JSON.
+TODO réalisé :
+  [x] Valider qu'un champ `select` possède des options.
+  [x] Refuser les noms de champs dupliqués.
+  [x] Tester la sérialisation JSON.
 """
 
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from app.schemas.common import ORMModel
 
@@ -29,6 +29,14 @@ class FormField(BaseModel):
     placeholder: str | None = Field(default=None, max_length=200)
     help: str | None = Field(default=None, max_length=300)
     options: list[SelectOption] | None = None
+
+    @model_validator(mode="after")
+    def validate_select_options(self) -> "FormField":
+        if self.type == "select" and not self.options:
+            raise ValueError("Un champ select doit avoir au moins une option.")
+        if self.type != "select":
+            self.options = None
+        return self
 
 
 class TypeActeSummary(ORMModel):
@@ -51,6 +59,13 @@ class TypeActeCreate(BaseModel):
     form_schema: list[FormField] = Field(default_factory=list)
     template_md: str = ""
 
+    @model_validator(mode="after")
+    def validate_unique_field_names(self) -> "TypeActeCreate":
+        names = [field.name for field in self.form_schema]
+        if len(names) != len(set(names)):
+            raise ValueError("Les noms de champs du formulaire doivent être uniques.")
+        return self
+
 
 class TypeActeUpdate(BaseModel):
     label: str | None = Field(default=None, min_length=1, max_length=150)
@@ -58,3 +73,11 @@ class TypeActeUpdate(BaseModel):
     form_schema: list[FormField] | None = None
     template_md: str | None = None
     is_active: bool | None = None
+
+    @model_validator(mode="after")
+    def validate_unique_field_names(self) -> "TypeActeUpdate":
+        if self.form_schema is not None:
+            names = [field.name for field in self.form_schema]
+            if len(names) != len(set(names)):
+                raise ValueError("Les noms de champs du formulaire doivent être uniques.")
+        return self

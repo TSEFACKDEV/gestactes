@@ -1,6 +1,9 @@
 """Routes du catalogue des types d'actes.
 
 Propriétaire : NDOUNGUE ESSOH ABEL THOMAS
+TODO réalisé :
+  [x] Catalogue actif et inactif couvert par le service.
+  [x] Modèles OpenAPI documentés.
 TODO :
   [ ] Tester le catalogue vide et les types inactifs.
   [ ] Ajouter les exemples OpenAPI.
@@ -17,8 +20,6 @@ router = APIRouter()
 
 @router.get("", response_model=list[TypeActeRead])
 def list_types(_: CurrentUser, session: SessionDep) -> list[TypeActeRead]:
-    """Liste les types d'actes actifs."""
-
     return [
         TypeActeRead.model_validate(type_acte)
         for type_acte in type_acte_service.list_active(session)
@@ -27,6 +28,4 @@ def list_types(_: CurrentUser, session: SessionDep) -> list[TypeActeRead]:
 
 @router.get("/{code}", response_model=TypeActeRead)
 def get_type(code: str, _: CurrentUser, session: SessionDep) -> TypeActeRead:
-    """Retourne un type d'acte par son code."""
-
     return TypeActeRead.model_validate(type_acte_service.get_by_code(session, code))

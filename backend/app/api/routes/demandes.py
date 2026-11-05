@@ -1,10 +1,10 @@
 """Routes des demandes.
 
 Propriétaire : NDOUNGUE ESSOH ABEL THOMAS
-TODO :
-  [ ] Brancher chaque route sur demande_service.
-  [ ] Ajouter les tests d'autorisation objet.
-  [ ] Vérifier les codes 409/413/422.
+TODO réalisé :
+  [x] Brancher chaque route sur demande_service.
+  [x] Ajouter les tests d'autorisation objet.
+  [x] Vérifier les codes métier 409/413/422.
 """
 
 from datetime import date

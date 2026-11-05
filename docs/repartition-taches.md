@@ -496,30 +496,30 @@ npm run build
 **Branches et étapes :**
 
 1. `feat/back-domain-models`
-   - [ ] Finaliser les modèles et les schémas.
-   - [ ] Valider le schéma de formulaire (champs uniques, options).
-   - [ ] Numérotation : insertion, flush, `format_numero`.
-   - [ ] Catalogue public et admin.
+   - [x] Finaliser les modèles et les schémas.
+   - [x] Valider le schéma de formulaire (champs uniques, options).
+   - [x] Numérotation : insertion, flush, `format_numero`.
+   - [x] Catalogue public et admin.
 2. `feat/back-demandes-create`
-   - [ ] Création avec validation du formulaire et des pièces.
-   - [ ] Idempotence `Idempotency-Key`.
-   - [ ] Écriture de la demande, des pièces, de l'audit et de l'outbox.
-   - [ ] Liste filtrée et autorisation objet.
-   - [ ] Détail, annulation.
-   - [ ] Tests 201/403/409/413/422.
+   - [x] Création avec validation du formulaire et des pièces.
+   - [x] Idempotence `Idempotency-Key`.
+   - [x] Écriture de la demande, des pièces, de l'audit et de l'outbox.
+   - [x] Liste filtrée et autorisation objet.
+   - [x] Détail et annulation.
+   - [x] Tests locaux 201/403/404/409/413/422.
 3. `feat/back-workflow-take-charge`
-   - [ ] `apply_transition` dans `workflow_service`.
-   - [ ] Prise en charge, assignation, branche, audit, job.
-   - [ ] Complément, mise à jour du contenu (commit).
-   - [ ] Verrouillage de la demande contre les doubles actions.
+   - [x] `apply_transition` dans `workflow_service`.
+   - [x] Prise en charge, assignation, branche, audit, job.
+   - [x] Complément et mise à jour locale du contenu.
+   - [x] Verrouillage de la demande contre les doubles actions en base.
 4. `feat/back-workflow-submit`
-   - [ ] Soumission, ouverture de PR, label, reviewers.
-   - [ ] Décisions, historique, diff données/contenu, export CSV.
-   - [ ] Tests de chaque transition et des rôles.
+   - [ ] Soumission et orchestration GitHub complète (PR, label, reviewers): dépend de NOLACK.
+   - [x] Décisions locales, historique, diff, export CSV.
+   - [ ] Tests de chaque transition GitHub et de tous les rôles.
 5. `feat/back-signature`
-   - [ ] Manifeste de signature, hash, merge, champs de signature.
-   - [ ] Orchestration avec `github_service`.
-   - [ ] Tests de non-régression.
+   - [x] Manifeste de signature, hash local et champs de signature.
+   - [ ] Merge GitHub et PDF: orchestration finale dépend de NOLACK.
+   - [ ] Tests GitHub/PDF de non-régression: dépend de NOLACK.
 
 **Tests :**
 
