@@ -536,7 +536,7 @@ export function RequestDetailPage() {
                   </p>
                 </div>
                 <Link
-                  to={`/verification/${encodeURIComponent(demande.numero)}`}
+                  to={`/verifier/${encodeURIComponent(demande.numero)}`}
                   className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
                 >
                   Vérifier l'authenticité de l'acte

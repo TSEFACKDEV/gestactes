@@ -78,10 +78,29 @@ cp .env.example .env
 docker compose up --build
 ```
 
-Puis charger les comptes de démonstration :
+Le jeu de démonstration est chargé automatiquement au démarrage de l'API
+(`AUTO_SEED=true`). Il est idempotent : le relancer ne crée pas de doublons.
+
+Il contient :
+
+- 4 comptes : citoyen, agent, validateur, administrateur ;
+- 3 types d'actes camerounais ;
+- 9 demandes couvrant tous les états du workflow, avec pièces PDF, historique
+  d'audit et notifications ;
+- 2 actes signés/archivés dont le PDF et les pièces sont consultables sans
+  token GitHub.
+
+Pour rejouer le seed manuellement :
 
 ```bash
 docker compose exec api python -m app.seed
+```
+
+Pour repartir d'une base vide :
+
+```bash
+docker compose down -v
+docker compose up --build
 ```
 
 ### Ouvrir

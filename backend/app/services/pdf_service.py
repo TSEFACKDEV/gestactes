@@ -14,7 +14,7 @@ from app.schemas.acte import ActeContent, SignatureManifest
 def verification_url(numero: str) -> str:
     """URL publique encodée dans le QR code."""
 
-    return f"{settings.frontend_url}/verification/{numero}"
+    return f"{settings.frontend_url}/verifier/{numero}"
 
 
 def generate_pdf(

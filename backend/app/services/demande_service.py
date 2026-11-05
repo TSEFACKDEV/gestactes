@@ -16,7 +16,7 @@ import hashlib
 import io
 import json
 import re
-from pathlib import PurePath
+from pathlib import Path, PurePath
 from typing import Any
 
 from sqlmodel import Session, select
@@ -526,6 +526,13 @@ def get_piece(
     piece = session.get(PieceJointe, piece_id)
     if piece is None or piece.demande_id != demande.id:
         raise AppError("Pièce introuvable.", status_code=404, code="NOT_FOUND")
+    # Les pièces du jeu de démonstration sont livrées avec le projet : elles
+    # restent consultables sans token GitHub, y compris hors ligne.
+    if piece.github_path.startswith("demo/pieces/"):
+        demo_path = Path(__file__).resolve().parent.parent / "seed_data" / "pieces" / piece.filename
+        if demo_path.is_file():
+            return piece, demo_path.read_bytes()
+
     from app.services import github_service
 
     try:
@@ -554,6 +561,17 @@ def get_pdf(session: Session, demande_id: int, user: User) -> bytes:
             status_code=409,
             code="INVALID_TRANSITION",
         )
+    # Les actes signés de démonstration ont un PDF local pour que le parcours
+    # reste complet sans dépôt GitHub configuré.
+    demo_pdf = (
+        Path(__file__).resolve().parent.parent
+        / "seed_data"
+        / "pdf"
+        / f"acte-{demande.numero}.pdf"
+    )
+    if demo_pdf.is_file():
+        return demo_pdf.read_bytes()
+
     from app.services import github_service
 
     try:

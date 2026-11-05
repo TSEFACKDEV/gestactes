@@ -916,7 +916,7 @@ SMTP_FROM=no-reply@gestactes.local
 
 MAX_UPLOAD_MB=5
 MAX_FILES=3
-AUTO_SEED=false
+AUTO_SEED=true
 ```
 
 ## Annexe B — Commandes de démarrage
