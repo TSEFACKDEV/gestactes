@@ -175,7 +175,6 @@ export default function ProfilePage() {
   return (
     <>
       <section className="profile-hero" aria-label="Résumé du profil">
-        <img src="/images/hotel-de-ville-800.webp" alt="" width={800} height={1067} decoding="async" />
         <div className="avatar avatar--lg" aria-hidden="true">{initiales}</div>
         <div>
           <h1>{user.prenom} {user.nom}</h1>

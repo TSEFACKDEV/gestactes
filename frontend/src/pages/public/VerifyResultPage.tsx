@@ -26,7 +26,7 @@ export default function VerifyResultPage() {
       <div className="card" style={{ marginTop: ".5rem" }}>
         <h1 style={{ fontSize: "1.35rem" }}>Résultat de la vérification</h1>
 
-        {!valide && <Introuvable numero={numero} texte="Le format du numéro est incorrect (attendu : ACTE-2026-00042)." />}
+        {!valide && <Introuvable numero={numero} texte="Le format du numéro est incorrect (attendu : AR-2026-00042)." />}
         {valide && isLoading && <div className="empty"><Spinner dark /></div>}
         {valide && error && <Alert kind="error">{messageErreur(error)}</Alert>}
         {valide && !isLoading && !error && data === null && <Introuvable numero={numero} texte="Aucun acte signé ne correspond à ce numéro. Le document n'est pas vérifiable." />}

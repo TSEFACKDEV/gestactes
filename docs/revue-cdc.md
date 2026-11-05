@@ -83,7 +83,7 @@ des services indépendants sans réécriture du domaine.
 | G-04 | Aucune gestion de l'idempotence des webhooks. | Double traitement, doubles notifications, doubles commits. | Table `webhook_events` avec `delivery_id` unique + vérification HMAC `X-Hub-Signature-256`. |
 | G-05 | Un seul dépôt `actes-data` + un dépôt `actes-archives` + le dépôt de code. | Trois dépôts à synchroniser pour une équipe étudiante. | Un dépôt de données `gestactes-data` avec `actes/` et `archives/`, plus le dépôt de code. Le dossier `archives/` est protégé par convention et par CODEOWNERS. |
 | G-06 | Les pièces jointes binaires sont committées sans limite réaliste. | Dépôt qui gonfle, quotas, clones lents. | 3 pièces maximum, 5 Mo par pièce, types PDF/JPEG/PNG, nom nettoyé, hash SHA-256, avertissement sur Git LFS. |
-| G-07 | Les noms de branches utilisent `ACTE-2026-00042` en majuscules. | URL et outillage moins prévisibles. | `acte/2026-00042`, en minuscules. |
+| G-07 | Les noms de branches utilisent `AR-2026-00042` en majuscules. | URL et outillage moins prévisibles. | `acte/AR-2026-00042`, en minuscules. |
 | G-08 | Le compte technique GitHub n'est pas tranché (PAT ou GitHub App). | Blocage au moment de l'intégration. | PAT fine-grained pour le MVP, GitHub App documentée comme évolution. |
 
 ### 3.4 API REST
@@ -127,7 +127,7 @@ des services indépendants sans réécriture du domaine.
 
 | ID | Constat | Risque | Correction v2.0 |
 |---|---|---|---|
-| U-01 | Aucune direction artistique. | Interface hétérogène. | Design system soft et professionnel : Manrope/Inter, palette sauge, icônes Lucide, animations discrètes. |
+| U-01 | Aucune direction artistique. | Interface hétérogène. | Design system soft et professionnel : Plus Jakarta Sans, vert forêt/or, icônes Lucide, animations discrètes. |
 | U-02 | Aucune exigence d'accessibilité concrète. | Interface difficile à utiliser. | Contraste, focus visible, labels, navigation clavier, `prefers-reduced-motion`. |
 | U-03 | Aucun état vide, chargement ou erreur défini. | Écrans incomplets. | Composants `EmptyState`, `Skeleton`, `Alert`, `Spinner` imposés. |
 | U-04 | Le responsive est mentionné mais non testé. | Mauvaise expérience mobile. | Points de rupture Tailwind et test mobile dans la recette. |

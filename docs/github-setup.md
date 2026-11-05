@@ -114,7 +114,7 @@ gh label create "statut:rejetee"         --color "B45151" --description "Rejeté
 gh label create "statut:annulee"         --color "6B7280" --description "Annulée"
 gh label create "type:attestation-residence"          --color "C9A66B" --description "Attestation de résidence"
 gh label create "type:extrait-naissance"              --color "C9A66B" --description "Extrait d'acte de naissance"
-gh label create "type:autorisation-administrative"    --color "C9A66B" --description "Autorisation administrative"
+gh label create "type:autorisation-batir"    --color "C9A66B" --description "Autorisation de bâtir"
 gh label create "complement:attendu"     --color "B7791F" --description "Complément demandé au citoyen"
 gh label create "priorite:haute"         --color "B45151" --description "Priorité haute"
 gh label create "priorite:moyenne"       --color "B7791F" --description "Priorité moyenne"
@@ -261,12 +261,12 @@ gestactes-data/
   actes/
     attestation-residence/.gitkeep
     extrait-naissance/.gitkeep
-    autorisation-administrative/.gitkeep
+    autorisation-batir/.gitkeep
   archives/.gitkeep
   modeles/
     attestation-residence.json
     extrait-naissance.json
-    autorisation-administrative.json
+    autorisation-batir.json
   .github/
     workflows/
       validate-acte.yml

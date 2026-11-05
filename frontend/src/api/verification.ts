@@ -1,7 +1,7 @@
 /**
  * API publique de vérification.
  * Propriétaire : GUEMOGNE GERALDINE ESTHER
- * TODO : aligner le format du numéro avec le backend (sans préfixe ACTE-).
+ * Le numéro peut être saisi avec ou sans préfixe (AR, EN, AB, ACTE).
  */
 
 import axios from "axios";
@@ -31,7 +31,7 @@ interface BackendVerification {
 
 export async function verifierActe(numero: string): Promise<ActeVerification | null> {
   if (USE_MOCK) return mockVerifier(numero);
-  const clean = numero.replace(/^ACTE-/i, "");
+  const clean = numero.trim().toUpperCase();
   try {
     const { data } = await api.get<BackendVerification>(
       `/verification/${encodeURIComponent(clean)}`,

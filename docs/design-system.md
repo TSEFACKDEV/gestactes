@@ -59,22 +59,22 @@ fontFamily: {
 
 | Token | Hex | Usage |
 |---|---|---|
-| `canvas` | `#F7F6F3` | Fond général. |
+| `canvas` | `#F7F4EC` | Fond général chaud. |
 | `surface` | `#FFFFFF` | Cartes, formulaires, modales. |
 | `surface-muted` | `#F1EFEA` | Zones secondaires, hover. |
-| `ink` | `#1F2A28` | Texte principal. |
-| `ink-soft` | `#5F6B68` | Texte secondaire. |
-| `line` | `#E5E2DB` | Bordures. |
-| `primary` | `#2F6F68` | Actions principales, liens actifs. |
-| `primary-hover` | `#275E58` | Hover. |
-| `primary-soft` | `#E8F1EF` | Fonds d'état actif, badges. |
-| `accent` | `#B98A4A` | Accent rare : numéros, mise en avant. |
-| `accent-soft` | `#F6EEE2` | Fond accent. |
-| `success` | `#3F7D5A` | Succès. |
+| `ink` | `#24332A` | Texte principal. |
+| `ink-soft` | `#64756A` | Texte secondaire. |
+| `line` | `#DDD8CC` | Bordures. |
+| `primary` | `#1E4D3A` | Vert forêt, actions principales. |
+| `primary-hover` | `#143528` | Hover. |
+| `primary-soft` | `#E4F0E7` | Fonds d'état actif, badges. |
+| `accent` | `#C08A2E` | Or camerounais, accent rare. |
+| `accent-soft` | `#F6EEE0` | Fond accent. |
+| `success` | `#2F7D5B` | Succès. |
 | `success-soft` | `#EAF3ED` | Fond succès. |
-| `warning` | `#B7791F` | Avertissement. |
+| `warning` | `#A97822` | Avertissement. |
 | `warning-soft` | `#FBF1DF` | Fond avertissement. |
-| `danger` | `#B45151` | Erreur, rejet. |
+| `danger` | `#B4453B` | Erreur, rejet. |
 | `danger-soft` | `#F9EAEA` | Fond erreur. |
 | `info` | `#4A6FA5` | Information. |
 | `info-soft` | `#EAF0F8` | Fond information. |
@@ -85,7 +85,7 @@ fontFamily: {
 - Les couleurs de statut sont toujours accompagnées d'un libellé, jamais de la
   couleur seule.
 - Pas de dégradé. Pas de néon. Pas de noir pur.
-- Le vert sauge est la couleur d'action ; le laiton est un accent, pas une
+- Le vert forêt est la couleur d'action ; l'or est un accent, pas une
   couleur d'action.
 
 ---
@@ -291,7 +291,7 @@ Règles :
 - Français, phrases courtes, ton neutre et professionnel.
 - Pas d'emoji.
 - Pas de majuscules criardes.
-- Les numéros d'acte sont en monospace : `2026-00042`.
+- Les numéros d'acte sont en monospace : `AR-2026-00042`.
 - Les dates sont affichées en `jj MMM yyyy` (ex. `12 oct. 2026`) et les heures
   en `HH:mm`.
 - Les erreurs expliquent **quoi faire**, pas seulement ce qui a échoué.

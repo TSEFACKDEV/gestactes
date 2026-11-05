@@ -47,15 +47,32 @@ DEMO_TYPES: list[dict[str, Any]] = [
     {
         "code": "attestation-residence",
         "label": "Attestation de résidence",
-        "description": "Atteste du lieu de résidence du demandeur.",
+        "description": (
+            "Atteste du lieu de résidence du demandeur dans la commune. "
+            "Document délivré par la mairie ou le chef de quartier."
+        ),
         "form_schema": [
+            {
+                "name": "arrondissement",
+                "label": "Arrondissement",
+                "type": "text",
+                "required": True,
+                "placeholder": "Douala 5e",
+            },
+            {
+                "name": "quartier",
+                "label": "Quartier",
+                "type": "text",
+                "required": True,
+                "placeholder": "Bonamoussadi",
+            },
             {
                 "name": "adresse",
                 "label": "Adresse complète",
                 "type": "textarea",
                 "required": True,
-                "placeholder": "12 rue des Lilas, 75000 Ville",
-                "help": "Adresse actuelle du demandeur.",
+                "placeholder": "Rue, immeuble, repère, ville",
+                "help": "Précisez un repère ou un point de référence.",
             },
             {
                 "name": "residence_depuis",
@@ -68,14 +85,16 @@ DEMO_TYPES: list[dict[str, Any]] = [
                 "label": "Motif de la demande",
                 "type": "textarea",
                 "required": False,
-                "help": "Facultatif. Ex. : démarche administrative.",
+                "help": "Facultatif. Ex. : inscription scolaire, démarche administrative.",
             },
         ],
         "template_md": (
             "# Attestation de résidence\n\n"
-            "Je soussigné(e), autorité compétente, atteste que "
+            "Je soussigné(e), autorité compétente de la commune, atteste que "
             "**{{ demandeur.prenom }} {{ demandeur.nom }}** réside à "
-            "l'adresse suivante : {{ donnees.adresse }}.\n\n"
+            "l'adresse suivante : {{ donnees.adresse }}, "
+            "quartier {{ donnees.quartier }}, arrondissement de "
+            "{{ donnees.arrondissement }}.\n\n"
             "Résidence depuis le : {{ donnees.residence_depuis }}.\n\n"
             "Numéro d'acte : **{{ numero }}**.\n"
         ),
@@ -83,8 +102,32 @@ DEMO_TYPES: list[dict[str, Any]] = [
     {
         "code": "extrait-naissance",
         "label": "Extrait d'acte de naissance",
-        "description": "Extrait simple d'acte de naissance.",
+        "description": (
+            "Extrait d'acte de naissance délivré par un centre d'état civil. "
+            "Il reprend les mentions de l'acte original."
+        ),
         "form_schema": [
+            {
+                "name": "numero_acte_naissance",
+                "label": "Numéro de l'acte de naissance",
+                "type": "text",
+                "required": True,
+                "placeholder": "Ex. : 1234/1998",
+            },
+            {
+                "name": "annee_acte",
+                "label": "Année de l'acte",
+                "type": "number",
+                "required": True,
+                "placeholder": "1998",
+            },
+            {
+                "name": "centre_etat_civil",
+                "label": "Centre d'état civil",
+                "type": "text",
+                "required": True,
+                "placeholder": "Mairie de Douala 5e",
+            },
             {
                 "name": "date_naissance",
                 "label": "Date de naissance",
@@ -97,6 +140,16 @@ DEMO_TYPES: list[dict[str, Any]] = [
                 "type": "text",
                 "required": True,
                 "placeholder": "Douala",
+            },
+            {
+                "name": "sexe",
+                "label": "Sexe",
+                "type": "select",
+                "required": True,
+                "options": [
+                    {"value": "M", "label": "Masculin"},
+                    {"value": "F", "label": "Féminin"},
+                ],
             },
             {
                 "name": "nom_pere",
@@ -114,39 +167,82 @@ DEMO_TYPES: list[dict[str, Any]] = [
         "template_md": (
             "# Extrait d'acte de naissance\n\n"
             "**{{ demandeur.prenom }} {{ demandeur.nom }}**, né(e) le "
-            "{{ donnees.date_naissance }} à {{ donnees.lieu_naissance }}.\n\n"
+            "{{ donnees.date_naissance }} à {{ donnees.lieu_naissance }},\n"
+            "sexe : {{ donnees.sexe }}.\n\n"
+            "Acte n° {{ donnees.numero_acte_naissance }} de l'année "
+            "{{ donnees.annee_acte }}, centre d'état civil : "
+            "{{ donnees.centre_etat_civil }}.\n\n"
+            "Père : {{ donnees.nom_pere }}. Mère : {{ donnees.nom_mere }}.\n\n"
             "Numéro d'acte : **{{ numero }}**.\n"
         ),
     },
     {
-        "code": "autorisation-administrative",
-        "label": "Autorisation administrative",
-        "description": "Autorisation simple pour une démarche administrative.",
+        "code": "autorisation-batir",
+        "label": "Autorisation de bâtir",
+        "description": (
+            "Autorisation municipale de construire ou de modifier un bâtiment. "
+            "Elle précise la parcelle, la nature des travaux et la durée de validité."
+        ),
         "form_schema": [
             {
-                "name": "objet",
-                "label": "Objet de l'autorisation",
+                "name": "nature_travaux",
+                "label": "Nature des travaux",
                 "type": "textarea",
                 "required": True,
+                "placeholder": "Construction d'une maison d'habitation, clôture, extension...",
+            },
+            {
+                "name": "adresse_parcelle",
+                "label": "Adresse de la parcelle",
+                "type": "textarea",
+                "required": True,
+                "placeholder": "Quartier, rue, repère",
+            },
+            {
+                "name": "quartier",
+                "label": "Quartier",
+                "type": "text",
+                "required": True,
+                "placeholder": "Bonamoussadi",
+            },
+            {
+                "name": "surface_terrain",
+                "label": "Surface du terrain (m²)",
+                "type": "number",
+                "required": True,
+                "placeholder": "500",
+            },
+            {
+                "name": "numero_titre",
+                "label": "Numéro de titre foncier",
+                "type": "text",
+                "required": False,
+                "help": "Facultatif si le dossier est en cours de régularisation.",
             },
             {
                 "name": "date_debut",
-                "label": "Date de début",
+                "label": "Date de début des travaux",
                 "type": "date",
                 "required": True,
             },
             {
-                "name": "date_fin",
-                "label": "Date de fin",
-                "type": "date",
+                "name": "duree_mois",
+                "label": "Durée de validité (mois)",
+                "type": "number",
                 "required": True,
+                "placeholder": "12",
             },
         ],
         "template_md": (
-            "# Autorisation administrative\n\n"
-            "Autorisation accordée à **{{ demandeur.prenom }} {{ demandeur.nom }}** "
-            "pour l'objet suivant : {{ donnees.objet }}.\n\n"
-            "Période : du {{ donnees.date_debut }} au {{ donnees.date_fin }}.\n\n"
+            "# Autorisation de bâtir\n\n"
+            "Autorisation délivrée à **{{ demandeur.prenom }} {{ demandeur.nom }}** "
+            "pour des travaux de {{ donnees.nature_travaux }}, sur la parcelle "
+            "située à {{ donnees.adresse_parcelle }}, quartier "
+            "{{ donnees.quartier }}.\n\n"
+            "Surface du terrain : {{ donnees.surface_terrain }} m².\n"
+            "Titre foncier : {{ donnees.numero_titre }}.\n"
+            "Début des travaux : {{ donnees.date_debut }}.\n"
+            "Validité : {{ donnees.duree_mois }} mois.\n\n"
             "Numéro d'acte : **{{ numero }}**.\n"
         ),
     },

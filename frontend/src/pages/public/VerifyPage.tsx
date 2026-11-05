@@ -13,7 +13,7 @@ export default function VerifyPage() {
   const aller = (numero: string) => navigate(`/verifier/${encodeURIComponent(numero)}`);
   const soumettre = (e: FormEvent) => {
     e.preventDefault();
-    if (!numeroValide(valeur)) return setErreur("Format attendu : ACTE-2026-00042.");
+    if (!numeroValide(valeur)) return setErreur("Format attendu : AR-2026-00042.");
     aller(normaliserNumero(valeur));
   };
   const surQr = (texte: string) => {
@@ -37,10 +37,10 @@ export default function VerifyPage() {
 
         {mode === "numero" ? (
           <form onSubmit={soumettre} noValidate>
-            <Field label="Numéro de l'acte" name="numero" placeholder="ACTE-2026-00042" icon={<Icon name="doc" />} value={valeur}
+            <Field label="Numéro de l'acte" name="numero" placeholder="AR-2026-00042" icon={<Icon name="doc" />} value={valeur}
               onChange={(e) => { setValeur(e.target.value); setErreur(undefined); }} error={erreur} autoComplete="off" autoCapitalize="characters" />
             <Button type="submit" variant="teal" block>Vérifier</Button>
-            <div className="chips" style={{ justifyContent: "center" }}>Exemple <button type="button" className="chip" onClick={() => { setValeur("ACTE-2026-00042"); setErreur(undefined); }}>ACTE-2026-00042</button></div>
+            <div className="chips" style={{ justifyContent: "center" }}>Exemple <button type="button" className="chip" onClick={() => { setValeur("AR-2026-00042"); setErreur(undefined); }}>AR-2026-00042</button></div>
           </form>
         ) : (
           <>

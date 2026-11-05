@@ -67,7 +67,7 @@ Vérifier :
 ### 3.4 GitHub
 
 1. Ouvrir l'Issue.
-2. Montrer la branche `acte/2026-00042`.
+2. Montrer la branche `acte/AR-2026-00042`.
 3. Montrer les commits.
 4. Ouvrir la Pull Request.
 5. Montrer le label `statut:en-validation`.
@@ -92,7 +92,7 @@ Vérifier :
 
 ### 3.7 Vérification publique
 
-1. Ouvrir `/verification/2026-00042`.
+1. Ouvrir `/verification/AR-2026-00042`.
 2. Montrer « Valide », le type, la date, le signataire, le hash.
 3. Rappeler qu'aucune donnée personnelle n'est exposée.
 

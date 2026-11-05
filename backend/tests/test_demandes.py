@@ -71,7 +71,7 @@ def test_citizen_can_create_demande(client, auth_headers, type_acte):
     )
     assert response.status_code == 201
     payload = response.json()
-    assert payload["numero"].startswith(f"{datetime.now().year}-")
+    assert payload["numero"].startswith(f"AR-{datetime.now().year}-")
 
 
 def test_citizen_cannot_see_other_demande(client, auth_headers, type_acte, users, session):

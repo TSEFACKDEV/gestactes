@@ -1,22 +1,28 @@
 """Numérotation des actes.
 
 Propriétaire : NDOUNGUE ESSOH ABEL THOMAS
-TODO réalisé :
-  [x] Format fondé sur l'identifiant global unique de la demande.
-  [x] Stratégie documentée dans le modèle et l'architecture.
-  [ ] Test de concurrence sur la numérotation.
+Les préfixes permettent d'identifier le type d'acte dès la lecture du numéro :
+AR = attestation de résidence, EN = extrait d'acte de naissance,
+AB = autorisation de bâtir.
 """
 
 from datetime import UTC, datetime
 
+TYPE_PREFIXES: dict[str, str] = {
+    "attestation-residence": "AR",
+    "extrait-naissance": "EN",
+    "autorisation-batir": "AB",
+}
+DEFAULT_PREFIX = "ACTE"
 
-def format_numero(year: int, demande_id: int) -> str:
-    """Construit le numéro public à partir de l'identifiant technique.
 
-    Le numéro reste unique car l'identifiant de la demande est global.
-    """
+def prefix_for_type(type_code: str) -> str:
+    return TYPE_PREFIXES.get(type_code, DEFAULT_PREFIX)
 
-    return f"{year}-{demande_id:06d}"
+
+def format_numero(year: int, demande_id: int, prefix: str = DEFAULT_PREFIX) -> str:
+    """Construit le numéro public, unique et lisible."""
+    return f"{prefix}-{year}-{demande_id:06d}"
 
 
 def current_year() -> int:

@@ -19,7 +19,7 @@ export default function LoginPage() {
   const onSubmit = async (d: LoginForm) => {
     setErreur(undefined);
     try {
-      const user = await login(d.email, d.password, !!d.remember);
+      const user = await login(d.email, d.password);
       navigate(from ?? HOME_BY_ROLE[user.role], { replace: true });
     } catch (e) { setErreur(messageErreur(e)); }
   };
@@ -33,8 +33,7 @@ export default function LoginPage() {
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <Field label="Adresse e-mail" type="email" autoComplete="email" icon={<IconMail />} error={errors.email?.message} {...register("email")} />
         <Field label="Mot de passe" type="password" autoComplete="current-password" icon={<IconLock />} error={errors.password?.message} {...register("password")} />
-        <div className="row-between" style={{ marginBottom: "1rem" }}>
-          <label className="check" style={{ margin: 0 }}><input type="checkbox" {...register("remember")} /> Se souvenir de moi</label>
+        <div className="row-between" style={{ marginBottom: "1rem", justifyContent: "flex-end" }}>
           <Link to="/mot-de-passe-oublie">Mot de passe oublié ?</Link>
         </div>
         <Button type="submit" block loading={isSubmitting}>Se connecter</Button>

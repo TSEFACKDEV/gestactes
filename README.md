@@ -36,6 +36,32 @@ Projet académique — **Architecture logicielle et objets répartis**
 
 ---
 
+## 1 bis. Types d'actes et identification
+
+Le jeu de démonstration est adapté aux communes camerounaises. Chaque type
+d'acte possède un code, un préfixe de numéro et des champs d'identification
+propres.
+
+| Acte | Code | Numéro | Éléments d'identification |
+|---|---|---|---|
+| Attestation de résidence | `attestation-residence` | `AR-2026-00042` | Nom et prénom, arrondissement, quartier, adresse, date de résidence, signature et QR code. |
+| Extrait d'acte de naissance | `extrait-naissance` | `EN-2026-00042` | Numéro et année de l'acte, centre d'état civil, nom, date et lieu de naissance, sexe, père, mère. |
+| Autorisation de bâtir | `autorisation-batir` | `AB-2026-00042` | Nature des travaux, parcelle, quartier, surface, titre foncier, date de début, durée de validité. |
+
+Le préfixe permet d'identifier immédiatement la nature de l'acte. Le numéro
+complet, l'empreinte SHA-256 et le QR code sont utilisés pour la vérification
+publique.
+
+### Contexte étranger
+
+Le modèle n'est pas verrouillé sur le Cameroun : les types d'actes sont
+configurables depuis l'administration. Pour un autre pays, il suffit de changer
+les modèles, les préfixes, les champs et les mentions légales. La section
+« Contexte international » de `docs/contextes-internationaux.md` détaille la
+démarche.
+
+---
+
 ## 2. Démarrage en une commande
 
 ### Prérequis
@@ -301,6 +327,7 @@ TODO.
 | `docs/recette.md` | Scénarios de recette. |
 | `docs/demo.md` | Script de démonstration. |
 | `docs/rapport-integration.md` | Réconciliation des travaux de l'équipe. |
+| `docs/contextes-internationaux.md` | Adaptation à d'autres pays et collectivités. |
 | `docs/onboarding.md` | Parcours d'arrivée d'un nouveau membre. |
 | `docs/repartition-taches.md` | Propriétaires, branches, tâches. |
 
@@ -339,7 +366,16 @@ Encadrant : **M. TCHUIGOUA CHARLU**.
 
 ---
 
-## 13. Licence et contexte
+## 13. Crédits
+
+- Photo de la mairie : **Minette Lontsie**, Wikimedia Commons, licence **CC BY-SA 4.0**. Source : `File:Mairie_de_Douala_V.jpg`.
+- Icônes : Lucide via `react-icons`.
+- Police : Plus Jakarta Sans.
+- Logo : monogramme HTML/CSS, sans image générée.
+
+---
+
+## 14. Licence et contexte
 
 Projet académique réalisé dans le cadre du module **Architecture logicielle et
 objets répartis** à l'ENSPD. Les données sont fictives et le projet n'a aucune

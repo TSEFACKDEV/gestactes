@@ -41,7 +41,7 @@ vérifier le parcours complet.
 - `AppLayout` pointe vers les vraies routes par rôle.
 - Mapping des contrats API : `Page<Demande>` → liste citoyen, statuts
   `en_instruction` → `en-instruction`, vérification publique.
-- Validation des numéros `2026-00042` et `ACTE-2026-00042`.
+- Validation des numéros `AR-2026-00042` et `AR-2026-00042`.
 - Libellés d'audit humanisés dans les timelines.
 - Champs dynamiques dotés d'un attribut `name` pour l'accessibilité et les tests.
 - Police unifiée sur Plus Jakarta Sans.

@@ -49,15 +49,16 @@ export function Icon({ name, size = 20 }: { name: IconName; size?: number }) {
   );
 }
 
-/* ---------- Logo ---------- */
+/* ---------- Logo simple HTML/CSS ---------- */
 export function LogoMark({ size = 40 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true">
-      <path d="M10 30c0 14 8 24 22 28C46 54 54 44 54 30" fill="none" stroke="#D9A441" strokeWidth="3" strokeLinecap="round" />
-      <path d="M32 8l18 6v15c0 12-8 20-18 24C22 49 14 41 14 29V14z" fill="#168C83" stroke="#fff" strokeWidth="2.5" />
-      <path d="M32 8l18 6v15c0 12-8 20-18 24z" fill="#123B5D" opacity=".35" />
-      <path d="M24 30l6 6 11-13" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+    <span
+      className="logo__mark"
+      style={{ width: size, height: size, fontSize: Math.round(size * 0.34) }}
+      aria-hidden="true"
+    >
+      GA
+    </span>
   );
 }
 

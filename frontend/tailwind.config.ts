@@ -7,35 +7,35 @@ export default {
   theme: {
     extend: {
       colors: {
-        canvas: "#F7F6F3",
+        canvas: "#F7F4EC",
         surface: "#FFFFFF",
-        "surface-muted": "#F1EFEA",
-        ink: "#1F2A28",
-        "ink-soft": "#5F6B68",
-        line: "#E5E2DB",
+        "surface-muted": "#EFEAE0",
+        ink: "#24332A",
+        "ink-soft": "#64756A",
+        line: "#DDD8CC",
         primary: {
-          DEFAULT: "#2F6F68",
-          hover: "#275E58",
-          soft: "#E8F1EF",
+          DEFAULT: "#2F7D5B",
+          hover: "#256347",
+          soft: "#E4F0E7",
         },
         accent: {
-          DEFAULT: "#B98A4A",
-          soft: "#F6EEE2",
+          DEFAULT: "#C08A2E",
+          soft: "#F6EEE0",
         },
         success: {
-          DEFAULT: "#3F7D5A",
+          DEFAULT: "#2F7D5B",
           soft: "#EAF3ED",
         },
         warning: {
-          DEFAULT: "#B7791F",
+          DEFAULT: "#A97822",
           soft: "#FBF1DF",
         },
         danger: {
-          DEFAULT: "#B45151",
+          DEFAULT: "#B4453B",
           soft: "#F9EAEA",
         },
         info: {
-          DEFAULT: "#4A6FA5",
+          DEFAULT: "#3F6A8A",
           soft: "#EAF0F8",
         },
       },

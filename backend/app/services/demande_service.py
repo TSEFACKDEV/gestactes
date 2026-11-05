@@ -46,7 +46,7 @@ from app.schemas.demande import (
 from app.schemas.type_acte import TypeActeSummary
 from app.schemas.user import UserSummary
 from app.services import audit_service, outbox_service, workflow_service
-from app.services.numbering import current_year, format_numero
+from app.services.numbering import current_year, format_numero, prefix_for_type
 
 
 def _type_summary(session: Session, type_id: int) -> TypeActeSummary:
@@ -236,7 +236,9 @@ def create_demande(
     )
     session.add(demande)
     session.flush()
-    demande.numero = format_numero(current_year(), demande.id or 0)
+    demande.numero = format_numero(
+        current_year(), demande.id or 0, prefix_for_type(type_acte.code)
+    )
 
     for uploaded, content in piece_data:
         filename = re.sub(

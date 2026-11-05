@@ -79,7 +79,7 @@ GitHub comme référentiel unique et auditable du contenu des actes.
 **Inclus dans la version 1**
 
 - Trois types d'actes : attestation de résidence, extrait d'acte de naissance,
-  autorisation administrative simple.
+  autorisation de bâtir.
 - Gestion des comptes et des rôles : citoyen, agent, validateur, administrateur.
 - Dépôt et suivi des demandes, pièces justificatives, instruction, validation,
   signature simulée, archivage, recherche, historique.
@@ -392,14 +392,14 @@ flowchart TB
 | Dépôt de données | `gestactes-data` (privé) | Un dépôt unique pour les actes et les archives. |
 | Stockage d'un acte | Dossier | `actes/<type>/<année>/<numéro>/` |
 | Contenu | Fichiers | `acte.json`, `acte.md`, `pieces/`, `signature.json`, `acte.pdf` |
-| Demande | Issue | Titre `[ACTE-2026-00042] Attestation de résidence — NOM Prénom` |
+| Demande | Issue | Titre `[AR-2026-00042] Attestation de résidence — NOM Prénom` |
 | Statut | Labels | `statut:demandee`, `statut:en-instruction`, etc. |
-| Brouillon | Branche | `acte/2026-00042` |
-| Modification | Commit | `[ACTE-2026-00042] instruction: correction de l'adresse` |
+| Brouillon | Branche | `acte/AR-2026-00042` |
+| Modification | Commit | `[AR-2026-00042] instruction: correction de l'adresse` |
 | Soumission | Pull Request | Vers `main`, revue demandée aux validateurs. |
 | Décision | Revue de PR | `Approve` ou `Request changes` ; rejet = commentaire + fermeture. |
 | Signature | Merge + manifeste | `signature.json` puis merge dans `main`. |
-| Archivage | Tag + copie | `acte-2026-00042-v1`, copie dans `archives/`. |
+| Archivage | Tag + copie | `acte-AR-2026-00042-v1`, copie dans `archives/`. |
 | Automatisation | GitHub Actions | Validation du JSON et des fichiers sur les PR. |
 | Retour d'événements | Webhooks | `issues`, `pull_request`, `pull_request_review`. |
 
@@ -410,17 +410,17 @@ gestactes-data/
   actes/
     attestation-residence/
       2026/
-        2026-00042/
+        AR-2026-00042/
           acte.json
           acte.md
           signature.json
           pieces/
             justificatif-domicile.pdf
     extrait-naissance/
-    autorisation-administrative/
+    autorisation-batir/
   archives/
     2026/
-      2026-00042/
+      AR-2026-00042/
         acte.json
         acte.md
         signature.json
@@ -428,7 +428,7 @@ gestactes-data/
   modeles/
     attestation-residence.json
     extrait-naissance.json
-    autorisation-administrative.json
+    autorisation-batir.json
   .github/
     workflows/
       validate-acte.yml
@@ -439,7 +439,7 @@ gestactes-data/
 
 ```json
 {
-  "numero": "2026-00042",
+  "numero": "AR-2026-00042",
   "type": "attestation-residence",
   "demandeur": { "id": 17, "nom": "Ndiaye", "prenom": "Awa" },
   "donnees": {
@@ -460,7 +460,7 @@ gestactes-data/
 
 ```json
 {
-  "numero": "2026-00042",
+  "numero": "AR-2026-00042",
   "sha256_acte_json": "9f2c...",
   "sha256_acte_md": "41ab...",
   "signataire": { "id": 8, "nom": "NZEUTEM", "prenom": "Eunice", "role": "validateur" },

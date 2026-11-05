@@ -1,5 +1,5 @@
 {
-  "numero": "2026-00042",
+  "numero": "AR-2026-00042",
   "type": "attestation-residence",
   "demandeur": {
     "id": 1,
@@ -7,9 +7,11 @@
     "prenom": "Awa"
   },
   "donnees": {
-    "adresse": "12 rue des Lilas, 75000 Ville",
+    "arrondissement": "Douala 5e",
+    "quartier": "Bonamoussadi",
+    "adresse": "Rue des Palmiers, immeuble Akwa, Douala",
     "residence_depuis": "2021-03-01",
-    "motif": "Démarche administrative"
+    "motif": "Inscription scolaire"
   },
   "instruction": {
     "agent_id": 2,

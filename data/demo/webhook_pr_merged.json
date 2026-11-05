@@ -5,10 +5,10 @@
     "number": 13,
     "merged": true,
     "merge_commit_sha": "def456abc789",
-    "title": "[2026-00042] Validation — Attestation de résidence",
+    "title": "[AR-2026-00042] Validation — Attestation de résidence",
     "html_url": "https://github.com/owner/gestactes-data/pull/13",
     "head": {
-      "ref": "acte/2026-00042"
+      "ref": "acte/AR-2026-00042"
     },
     "base": {
       "ref": "main"

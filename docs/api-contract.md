@@ -267,7 +267,7 @@ Retourne `Page<DemandeListItem>`.
   "items": [
     {
       "id": 42,
-      "numero": "2026-00042",
+      "numero": "AR-2026-00042",
       "type": { "code": "attestation-residence", "label": "Attestation de résidence" },
       "demandeur": { "id": 17, "first_name": "Awa", "last_name": "Ndiaye" },
       "statut": "en_validation",
@@ -291,7 +291,7 @@ Connecté, selon le périmètre. Retourne `DemandeRead` :
 ```json
 {
   "id": 42,
-  "numero": "2026-00042",
+  "numero": "AR-2026-00042",
   "type": { "id": 1, "code": "attestation-residence", "label": "Attestation de résidence" },
   "demandeur": { "id": 17, "first_name": "Awa", "last_name": "Ndiaye" },
   "statut": "en_validation",
@@ -299,7 +299,7 @@ Connecté, selon le périmètre. Retourne `DemandeRead` :
   "acte_md": "# Attestation de résidence\\n\\n...",
   "issue_number": 12,
   "issue_url": "https://github.com/owner/gestactes-data/issues/12",
-  "branch_name": "acte/2026-00042",
+  "branch_name": "acte/AR-2026-00042",
   "pr_number": 13,
   "pr_url": "https://github.com/owner/gestactes-data/pull/13",
   "assigned_agent": { "id": 4, "first_name": "Maxime", "last_name": "Leukam" },
@@ -449,9 +449,9 @@ Validateur.
 
 ```json
 {
-  "demande": { "statut": "signee", "numero": "2026-00042" },
+  "demande": { "statut": "signee", "numero": "AR-2026-00042" },
   "signature": {
-    "numero": "2026-00042",
+    "numero": "AR-2026-00042",
     "sha256_acte_json": "9f2c...",
     "sha256_acte_md": "41ab...",
     "signataire": { "id": 8, "nom": "NZEUTEM", "prenom": "Eunice", "role": "validateur" },
@@ -487,7 +487,7 @@ Public. Aucune donnée personnelle.
 ```json
 {
   "valide": true,
-  "numero": "2026-00042",
+  "numero": "AR-2026-00042",
   "type": "Attestation de résidence",
   "statut": "archivee",
   "signe_le": "2026-10-20T10:15:00Z",
@@ -513,7 +513,7 @@ Connecté.
     {
       "id": 9,
       "title": "Acte signé",
-      "message": "Votre attestation 2026-00042 est disponible.",
+      "message": "Votre attestation AR-2026-00042 est disponible.",
       "demande_id": 42,
       "is_read": false,
       "created_at": "2026-10-20T10:16:00Z"
@@ -642,7 +642,7 @@ Admin.
     "rejetee": 10,
     "annulee": 4
   },
-  "par_type": { "attestation-residence": 60, "extrait-naissance": 40, "autorisation-administrative": 20 },
+  "par_type": { "attestation-residence": 60, "extrait-naissance": 40, "autorisation-batir": 20 },
   "delai_moyen_heures": 36.5
 }
 ```

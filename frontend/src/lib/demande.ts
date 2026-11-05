@@ -98,3 +98,15 @@ export function eventDescription(actor: string, message: string): string {
   }
   return `${actor} — ${raw}`;
 }
+
+/** Message court expliquant la prochaine étape d'une demande. */
+export const NEXT_STEP: Record<Statut, string> = {
+  demandee: "Votre demande attend d'être prise en charge par un agent.",
+  "en-instruction": "Un agent instruit votre dossier et prépare l'acte.",
+  "en-validation": "Votre acte est en cours de contrôle par un validateur.",
+  validee: "Votre acte est validé, en attente de signature.",
+  signee: "Votre acte est signé. Le PDF sera bientôt disponible.",
+  archivee: "Votre acte est archivé et téléchargeable.",
+  rejetee: "Votre demande a été rejetée. Consultez le motif dans le dossier.",
+  annulee: "Votre demande a été annulée.",
+};

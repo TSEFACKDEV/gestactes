@@ -7,12 +7,12 @@ gestactes-data/
   actes/
     attestation-residence/.gitkeep
     extrait-naissance/.gitkeep
-    autorisation-administrative/.gitkeep
+    autorisation-batir/.gitkeep
   archives/.gitkeep
   modeles/
     attestation-residence.json
     extrait-naissance.json
-    autorisation-administrative.json
+    autorisation-batir.json
   .github/
     workflows/validate-acte.yml
     CODEOWNERS

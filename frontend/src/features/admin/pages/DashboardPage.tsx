@@ -24,6 +24,12 @@ import { fetchStats } from "@/features/admin/api";
 import { getApiErrorMessage } from "@/lib/api";
 import type { Statut } from "@/types";
 
+const TYPE_LABELS: Record<string, string> = {
+  "attestation-residence": "Attestation de résidence",
+  "extrait-naissance": "Extrait d'acte de naissance",
+  "autorisation-batir": "Autorisation de bâtir",
+};
+
 export function AdminDashboardPage() {
   const query = useQuery({
     queryKey: ["admin", "stats"],
@@ -148,8 +154,8 @@ export function AdminDashboardPage() {
               types.map(([type, count]) => (
                 <div key={type}>
                   <div className="flex items-center justify-between gap-3">
-                    <span className="text-sm capitalize text-ink">
-                      {type.replaceAll("-", " ")}
+                    <span className="text-sm text-ink">
+                      {TYPE_LABELS[type] ?? type.replaceAll("-", " ")}
                     </span>
                     <span className="font-mono text-xs text-ink-soft">{count}</span>
                   </div>

@@ -70,13 +70,13 @@ export const mockAuth = {
 };
 
 const ACTES: Record<string, ActeVerification> = {
-  "ACTE-2026-00042": {
-    authentique: true, numero: "ACTE-2026-00042", type_acte: "Attestation de résidence",
+  "AR-2026-00042": {
+    authentique: true, numero: "AR-2026-00042", type_acte: "Attestation de résidence",
     date_delivrance: "2026-10-15", statut: "archivee", commune: "Douala 1er",
     empreinte_sha256: "9f2c4ab07e51d3c8a6b1f0e4d7c92a58b3e61f0d4c7a9b28e5f13d06a7c8b4e2",
   },
-  "ACTE-2026-00125": {
-    authentique: true, numero: "ACTE-2026-00125", type_acte: "Extrait d'acte de naissance",
+  "EN-2026-00125": {
+    authentique: true, numero: "EN-2026-00125", type_acte: "Extrait d'acte de naissance",
     date_delivrance: "2026-03-15", statut: "signee", commune: "Douala 1er",
     empreinte_sha256: "1ab7c90e2d4f58a3b6c17d0e9f2a4b85c3d6e1f07a9b2c48d5e3f6a1b0c9d7e8",
   },
@@ -98,14 +98,14 @@ import type { Demande, Statut } from "@/lib/demande";
 
 export async function mockDemandes(): Promise<Demande[]> {
   await wait(400);
-  const types = ["Attestation de résidence", "Extrait d'acte de naissance", "Autorisation administrative"];
+  const types = ["Attestation de résidence", "Extrait d'acte de naissance", "Autorisation de bâtir"];
   const plan: [Statut, number][] = [
     ["demandee", 1], ["en-instruction", 3], ["archivee", 4], ["signee", 6], ["rejetee", 8], ["archivee", 11], ["signee", 13],
     ["validee", 16], ["archivee", 19], ["rejetee", 22], ["archivee", 25], ["signee", 28],
   ];
   return plan.map(([statut, age], i) => ({
     id: i + 1,
-    numero: `ACTE-2026-${String(456 - i * 7).padStart(5, "0")}`,
+    numero: `AR-2026-${String(456 - i * 7).padStart(5, "0")}`,
     type_acte: types[i % 3],
     statut,
     cree_le: new Date(Date.now() - age * 86_400_000).toISOString(),

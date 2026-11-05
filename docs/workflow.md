@@ -139,13 +139,13 @@ Le complément ne crée pas un nouvel état pour rester simple :
 | `en_instruction` | `statut:en-instruction` | `#4A6FA5` |
 | `en_validation` | `statut:en-validation` | `#7C5CBF` |
 | `validee` | `statut:validee` | `#3F7D5A` |
-| `signee` | `statut:signee` | `#2F6F68` |
+| `signee` | `statut:signee` | `#2F7D5B` |
 | `archivee` | `statut:archivee` | `#4B5563` |
 | `rejetee` | `statut:rejetee` | `#B45151` |
 | `annulee` | `statut:annulee` | `#6B7280` |
 | Type | `type:attestation-residence` | `#C9A66B` |
 | Type | `type:extrait-naissance` | `#C9A66B` |
-| Type | `type:autorisation-administrative` | `#C9A66B` |
+| Type | `type:autorisation-batir` | `#C9A66B` |
 | Complément | `complement:attendu` | `#B7791F` |
 
 Le worker ajoute le nouveau label et retire l'ancien. En cas d'échec, le label
@@ -162,10 +162,10 @@ Format :
 Exemples :
 
 ```text
-[ACTE-2026-00042] instruction: correction de l'adresse
-[ACTE-2026-00042] instruction: ajout de la pièce justificative
-[ACTE-2026-00042] signature: validation de Eunice NZEUTEM
-[ACTE-2026-00042] archive: génération du PDF et du tag
+[AR-2026-00042] instruction: correction de l'adresse
+[AR-2026-00042] instruction: ajout de la pièce justificative
+[AR-2026-00042] signature: validation de Eunice NZEUTEM
+[AR-2026-00042] archive: génération du PDF et du tag
 ```
 
 ## 11. Tests obligatoires du workflow
